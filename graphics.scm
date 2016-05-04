@@ -11,23 +11,11 @@
 
 ;; Library
 
-(define (sdl-pixel-format-to-cairo fmt)
-  (case (pixel-format-format fmt)
-    ((argb8888) CAIRO_FORMAT_ARGB32)
-    ((rgb24)    CAIRO_FORMAT_RGB24)
-    ((rgb565)   CAIRO_FORMAT_RGB16_565)
-    (else
-     (error "unsupported pixel format"))))
-
-(define (mouse-button-down-event? ev)
-  (and (mouse-button-event? ev)
-       (mouse-button-event-state ev)))
-
 (define objects-position
   (make-parameter
    (list->vector
     (list-tabulate num-objects
-                   (lambda (_) (list (random width) (random height)))))))
+                   (lambda (i) (list (+ 10 (* i (quotient 320 num-objects))) (- 150 50)))))))
 
 (define (find-object-at x y)
   (vector-index
@@ -44,21 +32,28 @@
     (set! *user-choices*
       (cons n (delete n *user-choices*)))))
 
-(define (square ctx x y)
-  (cairo-rectangle *cairo* x y 50 50))
-(define (show-object num)
-  (apply cairo-set-source-rgb *cairo*
-         (if (member num *user-choices*) '(0 1 0) '(1 0 0)))
-  (apply square *cairo* (vector-ref (objects-position) num))
-  (cairo-fill *cairo*))
+(define (square x y)
+  (render-fill-rect! *renderer* (make-rect x y 20 50)))
+(define (show-object! num)
+  (set! (render-draw-color *renderer*)
+    (if (member num *user-choices*) (make-color 0 255 0) (make-color 255 0 0)))
+  (apply square (vector-ref (objects-position) num)))
+(define (show-objects!)
+  (dotimes (i num-objects) (show-object! i)))
 
 (define (handle-events!)
   (let loop ((ev (poll-event!)))
-    (and (mouse-button-down-event? ev)
-         (register-choice!
-          (find-object-at
-           (mouse-button-event-x ev)
-           (mouse-button-event-y ev))))
+    (and (keyboard-event? ev)
+         (or (and (eq? (keyboard-event-scancode ev) 'a)
+                  (set! *player-left* (keyboard-event-state ev)))
+             (and (eq? (keyboard-event-scancode ev) 'd)
+                  (set! *player-right* (keyboard-event-state ev)))
+             (and (eq? (keyboard-event-scancode ev) 'escape)
+                  (exit 0))
+             (and (eq? (keyboard-event-scancode ev) 'space)
+                  (keyboard-event-state ev)
+                  (let ((obj (find-object-at *player-position* (- 150 30))))
+                    (set! *user-choices* (cons obj (delete obj *user-choices*)))))))
     (and ev (loop (poll-event!)))))
 
 (define (check-user-choices! cont)
@@ -69,6 +64,15 @@
         (print "You win!")
         (cont))))
 
+(define *player-left* #f)
+(define *player-right* #f)
+(define *player-position* 30)
+
+(define (show-player!)
+  (set! (render-draw-color *renderer*) (make-color 0 0 255))
+  (render-fill-rect! *renderer* (make-rect (round *player-position*) (- 150 60) 30 60)))
+
+
 ;; ===
 
 (set-main-ready!)
@@ -77,23 +81,25 @@
 (define *win*
   (create-window! "Blah" 'undefined 'undefined width height))
 
-(define *screen* (window-surface *win*))
+(define *renderer*
+  (create-renderer! *win* -1 '(accelerated)))
+(set! (render-logical-size *renderer*) '(320 180))
 
-(define *c-surface*
-  (cairo-image-surface-create-for-data
-   (surface-pixels-raw *screen*)
-   (sdl-pixel-format-to-cairo
-    (surface-format *screen*))
-   width
-   height
-   (surface-pitch *screen*)))
+(define background-texture
+  (create-texture-from-surface *renderer* (load-bmp "background.bmp")))
 
-(define *cairo* (cairo-create *c-surface*))
-
-(let loop ()
-  (handle-events!)
-  (dotimes (i num-objects) (show-object i))
-  (update-window-surface! *win*)
-  (if (= (length *user-choices*) num-choices)
-      (check-user-choices! loop)
-      (loop)))
+(let loop ((lt (get-ticks)))
+  (let* ((ct (get-ticks))
+         (dt (/ (- ct lt) 1000)))
+    (handle-events!)
+    (set! *player-position*
+      (+ *player-position*
+         (if *player-left* (- (* 50 dt)) 0)
+         (if *player-right* (* 50 dt) 0)))
+    (render-copy! *renderer* background-texture)
+    (show-objects!)
+    (show-player!)
+    (render-present! *renderer*)
+    (if (= (length *user-choices*) num-choices)
+        (check-user-choices! (lambda () (loop ct)))
+        (loop ct))))
