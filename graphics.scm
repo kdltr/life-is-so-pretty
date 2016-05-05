@@ -1,13 +1,15 @@
 (use sdl2
+     (prefix sdl2-image img:)
      cairo
      clojurian-syntax
      miscmacros
-     vector-lib)
+     vector-lib
+     utf8)
 
 (include "proto.scm")
 
-(define window-width 960)
-(define window-height 540)
+(define window-width 1920)
+(define window-height 1080)
 
 (define width 320)
 (define height 180)
@@ -15,15 +17,34 @@
 (define object-width 20)
 (define object-height 50)
 
-(define player-width 30)
-(define player-height 60)
 (define player-speed 70)
+(define player-width 23)
+(define player-height 79)
+
+(define view-border (+ (/ player-width 2) 40))
 
 (define floor-y 150)
 
-(define view-border (+ (/ player-width 2) 10))
+;;
+
+(set-main-ready!)
+(init!)
+(img:init!)
+
+(set-hint! 'render-vsync "0")
+(set-hint! 'render-scale-quality "0")
+
+(define *win*
+  (create-window! "Blah" 'undefined 'undefined window-width window-height '(fullscreen)))
+
+(define *renderer*
+  (create-renderer! *win* -1 '(accelerated)))
+(set! (render-logical-size *renderer*) (list width height))
+
 
 ;; Library
+
+(include "text.scm")
 
 (define objects-position
   (make-parameter
@@ -85,54 +106,41 @@
         (print "You win!")
         (cont))))
 
+(define player-left-texture
+  (create-texture-from-surface *renderer* (img:load "player-left.png")))
+(define player-right-texture
+  (create-texture-from-surface *renderer* (img:load "player-right.png")))
 (define *player-left* #f)
 (define *player-right* #f)
 (define *player-position* (- (/ width 2) (/ player-width 2)))
+(define *player-texture* player-right-texture)
 (define *view-position* 0)
 
 (define (show-player!)
-  (set! (render-draw-color *renderer*) (make-color 0 0 255))
-  (render-fill-rect! *renderer*
-                     (make-rect (round (- *player-position* *view-position*))
+  (render-copy! *renderer*
+                *player-texture*
+                #f
+                (make-rect (round (- *player-position* *view-position*))
                                 (- floor-y player-height)
                                 player-width
                                 player-height)))
 
 (define (move-player! dt)
-  (let ((increment (* player-speed dt)))
+  (let* ((factor (* player-speed dt))
+         (increment (+ (if *player-left* (- factor) 0)
+                       (if *player-right* factor 0))))
+    (set! *player-texture*
+      (cond ((< increment 0) player-left-texture)
+            ((> increment 0) player-right-texture)
+            (else *player-texture*)))
     (set! *player-position*
-      (min (- room-width player-width)
-           (max 0 (+ *player-position*
-                     (if *player-left* (- increment) 0)
-                     (if *player-right* increment 0)))))
+      (min (- room-width player-width) (max 0 (+ *player-position* increment))))
     (when (> *player-position* (+ *view-position* (- width player-width view-border)))
-      (set! *view-position* (+ *view-position* increment)))
+      (set! *view-position* (+ *view-position* factor)))
     (when (< *player-position* (+ *view-position* view-border))
-      (set! *view-position* (- *view-position* increment)))))
-
-(define (show-background!)
-  (render-copy! *renderer*
-                background-texture
-                #f
-                (make-rect (round (- 0 *view-position*)) 0 width height)))
+      (set! *view-position* (- *view-position* factor)))))
 
 ;; ===
-
-(set-main-ready!)
-(init!)
-
-(set-hint! 'render-vsync "0")
-(set-hint! 'render-scale-quality "0")
-
-(define *win*
-  (create-window! "Blah" 'undefined 'undefined window-width window-height))
-
-(define *renderer*
-  (create-renderer! *win* -1 '(accelerated)))
-(set! (render-logical-size *renderer*) (list width height))
-
-(define background-texture
-  (create-texture-from-surface *renderer* (load-bmp "background.bmp")))
 
 (let loop ((lt (get-ticks)))
   (let* ((ct (get-ticks))
@@ -141,9 +149,10 @@
     (move-player! dt)
     (set! (render-draw-color *renderer*) (make-color 255 255 255))
     (render-clear! *renderer*)
-    (show-background!)
     (show-objects!)
     (show-player!)
+    (show-text! 10 10 "Bonjour, je suis depressif! Aidez-moi a mourir. ☹")
+    (show-text! 10 24 "neRUSiten audietn aursiet ndptenrasptued tpnersta")
     (render-present! *renderer*)
     (if (= (length *user-choices*) num-choices)
         (check-user-choices! (lambda () (loop ct)))
