@@ -8,8 +8,8 @@
 
 (include "proto.scm")
 
-(define window-width 1920)
-(define window-height 1080)
+(define window-width 960)
+(define window-height 540)
 
 (define width 320)
 (define height 180)
@@ -23,6 +23,7 @@
 
 (define view-border (+ (/ player-width 2) 40))
 
+(define ceiling-y 30)
 (define floor-y 150)
 
 ;;
@@ -35,7 +36,7 @@
 (set-hint! 'render-scale-quality "0")
 
 (define *win*
-  (create-window! "Blah" 'undefined 'undefined window-width window-height '(fullscreen)))
+  (create-window! "Blah" 'undefined 'undefined window-width window-height '()))
 
 (define *renderer*
   (create-renderer! *win* -1 '(accelerated)))
@@ -46,22 +47,31 @@
 
 (include "text.scm")
 
-(define objects-position
-  (make-parameter
-   (list->vector
-    (let loop ((n 0)
-               (last-x 10))
-      (if (= n num-objects)
-          '()
-          (cons last-x (loop (add1 n) (+ last-x object-width 10 (random 50)))))))))
+(define bed-texture
+  (create-texture-from-surface *renderer* (img:load "bed.png")))
 
-(define room-width (+ 50 (vector-ref (objects-position) (sub1 num-objects))))
+(define objects-texture
+  (make-vector num-objects bed-texture))
+
+(define objects-position
+  (list->vector
+   (let loop ((n 0)
+              (last-x 10))
+     (if (= n num-objects)
+         '()
+         (let ((tex (vector-ref objects-texture n)))
+           (cons (make-rect last-x 0 (texture-w tex) (texture-h tex))
+                 (loop (add1 n) (+ last-x (texture-w tex)))))))))
+
+(define room-width
+  (let ((last-rect (vector-ref objects-position (sub1 num-objects))))
+    (+ 50 (rect-x last-rect) (rect-w last-rect))))
 
 (define (find-object-at x)
   (vector-index
-   (lambda (ox)
-     (< ox x (+ ox object-width)))
-   (objects-position)))
+   (lambda (r)
+     (< (rect-x r) x (+ (rect-x r) (rect-w r))))
+   objects-position))
 (define (find-object-at-player)
   (find-object-at
    (+ *player-position* (/ player-width 2))))
@@ -72,15 +82,13 @@
     (set! *user-choices*
       (cons n (delete n *user-choices*)))))
 
-(define (square x y)
-  (render-fill-rect! *renderer* (make-rect x y object-width object-height)))
 (define (show-object! num)
-  (set! (render-draw-color *renderer*)
-    (if (eq? num (find-object-at-player))
-        (make-color 255 0 255)
-        (if (member num *user-choices*) (make-color 0 255 0) (make-color 255 0 0))))
-  (square (round (- (vector-ref (objects-position) num) *view-position*))
-          (- floor-y object-height)))
+  (render-copy! *renderer*
+                (vector-ref objects-texture num)
+                #f
+                (let ((r (vector-ref objects-position num)))
+                  (make-rect (round (- (rect-x r) *view-position*))
+                             (rect-y r) (rect-w r) (rect-h r)))))
 (define (show-objects!)
   (dotimes (i num-objects) (show-object! i)))
 
@@ -151,8 +159,8 @@
     (render-clear! *renderer*)
     (show-objects!)
     (show-player!)
-    (show-text! 10 10 "Bonjour, je suis depressif! Aidez-moi a mourir. ☹")
-    (show-text! 10 24 "neRUSiten audietn aursiet ndptenrasptued tpnersta")
+    (show-text! 10 (+ ceiling-y 1) "Bonjour, je suis depressif! Aidez-moi a mourir. ☹")
+    (show-text! 10 (+ ceiling-y 14) "neRUSiten audietn aursiet ndptenrasptued tpnersta")
     (render-present! *renderer*)
     (if (= (length *user-choices*) num-choices)
         (check-user-choices! (lambda () (loop ct)))
