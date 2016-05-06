@@ -4,8 +4,10 @@
      clojurian-syntax
      miscmacros
      vector-lib
-     utf8)
+     utf8
+     srfi-1)
 
+(include "helpers")
 (include "proto.scm")
 
 (define window-width 960)
@@ -17,7 +19,7 @@
 (define object-width 20)
 (define object-height 50)
 
-(define player-speed 70)
+(define player-speed 150)
 (define player-width 23)
 (define player-height 79)
 
@@ -30,7 +32,7 @@
 
 (set-main-ready!)
 (init!)
-(img:init!)
+(img:init! '(png))
 
 (set-hint! 'render-vsync "0")
 (set-hint! 'render-scale-quality "0")
@@ -45,52 +47,53 @@
 
 ;; Library
 
+(include "objects")
 (include "text.scm")
 
-(define bed-texture
-  (create-texture-from-surface *renderer* (img:load "bed.png")))
-
-(define objects-texture
-  (make-vector num-objects bed-texture))
-
-(define objects-position
-  (list->vector
-   (let loop ((n 0)
-              (last-x 10))
-     (if (= n num-objects)
-         '()
-         (let ((tex (vector-ref objects-texture n)))
-           (cons (make-rect last-x 0 (texture-w tex) (texture-h tex))
-                 (loop (add1 n) (+ last-x (texture-w tex)))))))))
-
 (define room-width
-  (let ((last-rect (vector-ref objects-position (sub1 num-objects))))
-    (+ 50 (rect-x last-rect) (rect-w last-rect))))
-
-(define (find-object-at x)
-  (vector-index
-   (lambda (r)
-     (< (rect-x r) x (+ (rect-x r) (rect-w r))))
-   objects-position))
-(define (find-object-at-player)
-  (find-object-at
-   (+ *player-position* (/ player-width 2))))
+  (let* ((last-obj (last scene))
+         (pos (scene-filler-position last-obj))
+         (tex (scene-filler-texture last-obj)))
+    (+ pos (texture-w tex))))
 
 (define *user-choices* '())
-(define (register-choice! n)
-  (when (and n (< (length *user-choices*) num-choices))
+(define (register-choice! obj)
+  (when (and obj (< (length *user-choices*) num-choices))
     (set! *user-choices*
-      (cons n (delete n *user-choices*)))))
+      (let ((n (scene-object-number obj)))
+        (cons n (delete n *user-choices*))))))
 
-(define (show-object! num)
-  (render-copy! *renderer*
-                (vector-ref objects-texture num)
-                #f
-                (let ((r (vector-ref objects-position num)))
-                  (make-rect (round (- (rect-x r) *view-position*))
-                             (rect-y r) (rect-w r) (rect-h r)))))
-(define (show-objects!)
-  (dotimes (i num-objects) (show-object! i)))
+(define (show-object! obj)
+  (let* ((x (scene-object-position obj))
+         (num (scene-object-number obj))
+         (user-x (round (- x *view-position*)))
+         (name (vector-ref objects-name num))
+         (tex (vector-ref objects-texture num))
+         (len (string-length name))
+         (text-x (round (+ user-x (/ (texture-w tex) 2) (- (/ (* character-width len) 2)))))
+         (text-y (+ ceiling-y 20)))
+    (render-copy! *renderer*
+                  tex
+                  #f
+                  (make-rect user-x 0 (texture-w tex) (texture-h tex)))
+    (when (eq? obj (find-object-at-player))
+      (show-boxed-text! text-x text-y name
+                        (if (member num *user-choices*) '(128 128 128) '(0 0 0))))))
+
+(define (show-filler! flr)
+  (let* ((x (scene-filler-position flr))
+         (tex (scene-filler-texture flr)))
+    (render-copy! *renderer*
+                  tex
+                  #f
+                  (make-rect (round (- x *view-position*)) 0 (texture-w tex) (texture-h tex)))))
+
+(define (show-scene!)
+  (for-each
+   (lambda (elm)
+     (cond ((scene-filler? elm) (show-filler! elm))
+           ((scene-object? elm) (show-object! elm))))
+   scene))
 
 (define (handle-events!)
   (let loop ((ev (poll-event!)))
@@ -124,6 +127,10 @@
 (define *player-texture* player-right-texture)
 (define *view-position* 0)
 
+(define (find-object-at-player)
+  (find-object-at
+   (+ *player-position* (/ player-width 2))))
+
 (define (show-player!)
   (render-copy! *renderer*
                 *player-texture*
@@ -142,7 +149,7 @@
             ((> increment 0) player-right-texture)
             (else *player-texture*)))
     (set! *player-position*
-      (min (- room-width player-width) (max 0 (+ *player-position* increment))))
+      (min (- room-width player-width 55) (max 56 (+ *player-position* increment))))
     (when (> *player-position* (+ *view-position* (- width player-width view-border)))
       (set! *view-position* (+ *view-position* factor)))
     (when (< *player-position* (+ *view-position* view-border))
@@ -155,12 +162,10 @@
          (dt (/ (- ct lt) 1000)))
     (handle-events!)
     (move-player! dt)
-    (set! (render-draw-color *renderer*) (make-color 255 255 255))
+    (set! (render-draw-color *renderer*) (make-color 0 0 0))
     (render-clear! *renderer*)
-    (show-objects!)
+    (show-scene!)
     (show-player!)
-    (show-text! 10 (+ ceiling-y 1) "Bonjour, je suis depressif! Aidez-moi a mourir. ☹")
-    (show-text! 10 (+ ceiling-y 14) "neRUSiten audietn aursiet ndptenrasptued tpnersta")
     (render-present! *renderer*)
     (if (= (length *user-choices*) num-choices)
         (check-user-choices! (lambda () (loop ct)))
