@@ -61,7 +61,8 @@
                   (make-rect (* char-number character-width) 0 character-width character-height)
                   (make-rect x y character-width character-height))))
 
-(define (show-text! x y str)
+(define (show-text! x y str #!optional (color '(0 0 0)))
+  (set! (texture-color-mod font) color)
   (let loop ((chars (string->list str))
              (x x))
     (unless (null? chars)
