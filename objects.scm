@@ -54,13 +54,13 @@
 
 (define objects-texts
   (vector '("You watch some porn. You take some pleasure at it.")
-          '("You savagely punch your poor teddy bear. You feel a little guilty.\n\"… Why do I do  this ?\"")
-          '("You take  some random book in the shelf. \"Les Fleurs du Mal\" from Charles Baudelaire. It feels like he's talking directely to your heart whith his poetry.")
-          '("The phone is ringing. You answer it. It's some random classmate.\n\"Hi ? Yeah. Whatever. Thanks for calling, I guess… Bye.\"")
-          '("Some music is playing. You move your head in rhythm.\n\"I like this song so much !\"")
-          '("You play  some random anime\n\"Well, that is cool! I can't wait for the  next episode to come !\"")
+          '("You savagely punch your poor teddy bear. You feel a little guilty.\n\"…Why did I do this?\"")
+          '("You take some random book in the shelf. \"Les Fleurs du Mal\" from Charles Baudelaire. It feels like he's talking directely to your heart whith his poetry.")
+          '("The phone is ringing. You answer it. It's some random classmate.\n\"Hi? Yeah. Whatever. Thanks for calling, I guess… Bye.\"")
+          '("Some music is playing. You move your head in rhythm.\n\"I like this song so much!\"")
+          '("You play some random anime.\n\"Well, that is cool! I can't wait for the next episode to come!\"")
           '("You lay down and spend some time doing nothing…")
-          '("You  stare  at the box of medicine.\n\"Do I Really need to take  these ?\"")))
+          '("You stare at the box of medicine.\n\"Do I Really need to take these?\"")))
 
 (define (random-object)
   (random (vector-length objects-name)))

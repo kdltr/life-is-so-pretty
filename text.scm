@@ -82,18 +82,20 @@
          (box-y (- y character-height))
          (lines (string-split str "\n"))
          (max-len (fold (lambda (s n) (max (string-length s) n)) 0 lines)))
-    (show-formated-text!
+    (show-lines!
      box-x box-y
-     (string-append "A" (make-string max-len #\B) "C\n"
-                    (apply string-append
-                           (map (lambda (_) (string-append "D" (make-string max-len #\E) "F\n")) lines))
-                    "G" (make-string max-len #\H) "I")
-     box-font))
-  (show-formated-text! x y str text-font '(0 0 0)))
+     `(,(string-append "A" (make-string max-len #\B) "C")
+       ,@(map (lambda (_) (string-append "D" (make-string max-len #\E) "F")) lines)
+       ,(string-append "G" (make-string max-len #\H) "I"))
+     box-font)
+    (show-lines! x y lines text-font color)))
 
-(define (show-formated-text! x y str #!optional (font text-font) (color #f))
-  (let loop ((rest (string-split str "\n"))
+(define (show-lines! x y lines #!optional (font text-font) (color #f))
+  (let loop ((rest lines)
              (y y))
     (unless (null? rest)
       (show-text! x y (car rest) font color)
       (loop (cdr rest) (+ y character-height)))))
+
+(define (show-formated-text! str)
+  (show-boxed-text! 20 (+ ceiling-y 20) str big-box))

@@ -64,7 +64,7 @@
       (unless already-checked?
         (let loop ((ev (poll-event!)))
           (reset-movement!)
-          (show-formated-text! 20 (+ ceiling-y 20) (car (vector-ref objects-texts num)))
+          (show-formated-text! (car (vector-ref objects-texts num)))
           (render-present! *renderer*)
           (unless (and (keyboard-event? ev) (keyboard-event-state ev) (eq? 'space (keyboard-event-scancode ev)))
             (loop (poll-event!))))
