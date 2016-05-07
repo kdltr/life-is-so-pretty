@@ -58,10 +58,18 @@
 
 (define *user-choices* '())
 (define (register-choice! obj)
-  (when (and obj (< (length *user-choices*) num-choices))
-    (set! *user-choices*
-      (let ((n (scene-object-number obj)))
-        (cons n (delete n *user-choices*))))))
+  (when (and obj (scene-object? obj) (< (length *user-choices*) num-choices))
+    (let* ((num (scene-object-number obj))
+           (already-checked? (member num *user-choices*)))
+      (unless already-checked?
+        (let loop ((ev (poll-event!)))
+          (reset-movement!)
+          (show-formated-text! 20 (+ ceiling-y 20) (car (vector-ref objects-texts num)))
+          (render-present! *renderer*)
+          (unless (and (keyboard-event? ev) (keyboard-event-state ev) (eq? 'space (keyboard-event-scancode ev)))
+            (loop (poll-event!))))
+        (set! *user-choices*
+          (cons num (delete num *user-choices*)))))))
 
 (define (show-object! obj)
   (let* ((x (scene-object-position obj))
@@ -69,16 +77,16 @@
          (user-x (round (- x *view-position*)))
          (name (vector-ref objects-name num))
          (tex (vector-ref objects-texture num))
-         (len (string-length name))
+         (len (fold (lambda (s n) (max n (string-length s))) 0 (string-split name "\n")))
          (text-x (round (+ user-x (/ (texture-w tex) 2) (- (/ (* character-width len) 2)))))
          (text-y (+ ceiling-y 20)))
     (render-copy! *renderer*
                   tex
                   #f
                   (make-rect user-x 0 (texture-w tex) (texture-h tex)))
-    (when (eq? obj (find-object-at-player))
-      (show-boxed-text! text-x text-y name
-                        (if (member num *user-choices*) '(128 128 128) '(0 0 0))))))
+    (when (and (eq? obj (find-object-at-player))
+               (not (member num *user-choices*)))
+      (show-boxed-text! text-x text-y name small-box))))
 
 (define (show-filler! flr)
   (let* ((x (scene-filler-position flr))
@@ -95,37 +103,20 @@
            ((scene-object? elm) (show-object! elm))))
    scene))
 
-(define (handle-events!)
-  (let loop ((ev (poll-event!)))
-    (and (keyboard-event? ev)
-         (or (and (eq? (keyboard-event-scancode ev) 'a)
-                  (set! *player-left* (keyboard-event-state ev)))
-             (and (eq? (keyboard-event-scancode ev) 'd)
-                  (set! *player-right* (keyboard-event-state ev)))
-             (and (eq? (keyboard-event-scancode ev) 'escape)
-                  (exit 0))
-             (and (eq? (keyboard-event-scancode ev) 'space)
-                  (keyboard-event-state ev)
-                  (register-choice! (find-object-at-player)))))
-    (and ev (loop (poll-event!)))))
-
-(define (check-user-choices! cont)
-  (let ((num-good (interact *user-choices*)))
-    (print "Good objects: " num-good)
-    (set! *user-choices* '())
-    (if (= num-good num-choices)
-        (print "You win!")
-        (cont))))
-
 (define player-left-texture
   (create-texture-from-surface *renderer* (img:load "player-left.png")))
 (define player-right-texture
   (create-texture-from-surface *renderer* (img:load "player-right.png")))
 (define *player-left* #f)
 (define *player-right* #f)
+(define *player-interacting* #f)
 (define *player-position* (- (/ width 2) (/ player-width 2)))
 (define *player-texture* player-right-texture)
 (define *view-position* 0)
+
+(define (reset-movement!)
+  (set! *player-left* #f)
+  (set! *player-right* #f))
 
 (define (find-object-at-player)
   (find-object-at
@@ -157,11 +148,36 @@
 
 ;; ===
 
+(define (handle-events!)
+  (let loop ((ev (poll-event!)))
+    (and (keyboard-event? ev)
+         (or (and (eq? (keyboard-event-scancode ev) 'a)
+                  (set! *player-left* (keyboard-event-state ev)))
+             (and (eq? (keyboard-event-scancode ev) 'd)
+                  (set! *player-right* (keyboard-event-state ev)))
+             (and (eq? (keyboard-event-scancode ev) 'escape)
+                  (exit 0))
+             (and (eq? (keyboard-event-scancode ev) 'space)
+                  (keyboard-event-state ev)
+                  (set! *player-interacting* #t))))
+    (and ev (loop (poll-event!)))))
+
+(define (check-user-choices! cont)
+  (let ((num-good (interact *user-choices*)))
+    (print "Good objects: " num-good)
+    (set! *user-choices* '())
+    (if (= num-good num-choices)
+        (print "You win!")
+        (cont))))
+
 (let loop ((lt (get-ticks)))
   (let* ((ct (get-ticks))
          (dt (/ (- ct lt) 1000)))
     (handle-events!)
     (move-player! dt)
+    (when *player-interacting*
+      (register-choice! (find-object-at-player))
+      (set! *player-interacting* #f))
     (set! (render-draw-color *renderer*) (make-color 0 0 0))
     (render-clear! *renderer*)
     (show-scene!)

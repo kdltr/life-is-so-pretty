@@ -1,10 +1,12 @@
 
 (define small-box
   (create-texture-from-surface *renderer* (img:load "small-box.png")))
-(define font
+(define big-box
+  (create-texture-from-surface *renderer* (img:load "big-box.png")))
+(define text-font
   (create-texture-from-surface *renderer* (img:load "font.png")))
 (define character-width 6)
-(define character-height 12)
+(define character-height 14)
 
 (define first-capital 0)
 (define first-normal (+ first-capital 26))
@@ -55,46 +57,41 @@
            (+ first-special 17))
           ((= n (char->integer #\|))
            (+ first-special 18))
-          (else (sub1 (/ (texture-w font) character-width))))))
+          (else (sub1 (/ (texture-w text-font) character-width))))))
 
-(define (show-char! x y char)
+(define (show-char! x y char font)
   (let* ((char-number (char-encoding char)))
     (render-copy! *renderer*
                   font
                   (make-rect (* char-number character-width) 0 character-width character-height)
                   (make-rect x y character-width character-height))))
 
-(define (show-text! x y str #!optional (color '(0 0 0)))
-  (set! (texture-color-mod font) color)
+(define (show-text! x y str #!optional (font text-font) (color #f))
+  (when color
+    (set! (texture-color-mod font) color))
   (let loop ((chars (string->list str))
              (x x))
     (unless (null? chars)
-      (show-char! x y (car chars))
+      (show-char! x y (car chars) font)
       (loop (cdr chars) (+ x character-width)))))
 
-(define (show-boxed-text! x y str #!optional (color '(0 0 0)))
-  (let ((box-x (- x character-width))
-        (box-y (- y 5)))
-    (render-copy! *renderer*
-                  small-box
-                  (make-rect 0 0 character-width (texture-h small-box))
-                  (make-rect box-x box-y character-width (texture-h small-box)))
-    (dotimes (i (string-length str))
-      (render-copy! *renderer*
-                    small-box
-                    (make-rect character-width 0 character-width (texture-h small-box))
-                    (make-rect (+ box-x (* (add1 i) character-width))
-                               box-y
-                               character-width
-                               (texture-h small-box))))
-    (render-copy! *renderer*
-                  small-box
-                  (make-rect (- (texture-w small-box) character-width)
-                             0
-                             character-width
-                             (texture-h small-box))
-                  (make-rect (+ x (* (string-length str) character-width))
-                             box-y
-                             character-width
-                             (texture-h small-box))))
-  (show-text! x y str color))
+(define (show-boxed-text! x y str box-font #!optional (color '(0 0 0)))
+  (let* ((box-x (- x character-width))
+         (box-y (- y character-height))
+         (lines (string-split str "\n"))
+         (max-len (fold (lambda (s n) (max (string-length s) n)) 0 lines)))
+    (show-formated-text!
+     box-x box-y
+     (string-append "A" (make-string max-len #\B) "C\n"
+                    (apply string-append
+                           (map (lambda (_) (string-append "D" (make-string max-len #\E) "F\n")) lines))
+                    "G" (make-string max-len #\H) "I")
+     box-font))
+  (show-formated-text! x y str text-font '(0 0 0)))
+
+(define (show-formated-text! x y str #!optional (font text-font) (color #f))
+  (let loop ((rest (string-split str "\n"))
+             (y y))
+    (unless (null? rest)
+      (show-text! x y (car rest) font color)
+      (loop (cdr rest) (+ y character-height)))))
