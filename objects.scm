@@ -43,14 +43,14 @@
           meds-texture))
 
 (define objects-name
-  (vector "computer"
-          "plush"
-          "bookcase"
-          "phone"
-          "HiFi\nsystem"
-          "television"
-          "sofa"
-          "meds"))
+  (vector "Computer"
+          "Plush"
+          "Bookcase"
+          "Phone"
+          "HiFi"
+          "Television"
+          "Sofa"
+          "Meds"))
 
 (define objects-texts
   (vector '("You watch some porn.\nYou take some pleasure at it."
@@ -94,9 +94,18 @@
   (find
    (lambda (o)
      (and (scene-object? o)
-      (let ((ox (scene-object-position o))
-            (ow (texture-w (vector-ref objects-texture (scene-object-number o)))))
-        (and (< ox x (+ ox ow))
-             (scene-object-number o)))))
+          (let ((ox (scene-object-position o))
+                (ow (texture-w (vector-ref objects-texture (scene-object-number o)))))
+            (and (< ox x (+ ox ow))
+                 (scene-object-number o)))))
    scene))
 
+(define (find-filler-at x)
+  (find
+   (lambda (o)
+     (and (scene-filler? o)
+          (let ((ox (scene-filler-position o))
+                (ow (texture-w (scene-filler-texture o))))
+            (and (< ox x (+ ox ow))
+                 o))))
+   scene))

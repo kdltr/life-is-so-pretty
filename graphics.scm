@@ -57,20 +57,16 @@
     (+ pos (texture-w tex))))
 
 (define *user-choices* '())
+
+(define (turn-finished?)
+  (= (length *user-choices*) num-choices))
+
+(define (allowed-interaction? obj)
+  (and obj (scene-object? obj)
+       (not (member (scene-object-number obj) *user-choices*))))
+
 (define (register-choice! obj)
-  (when (and obj (scene-object? obj) (< (length *user-choices*) num-choices))
-    (let* ((num (scene-object-number obj))
-           (already-checked? (member num *user-choices*)))
-      (unless already-checked?
-        (let ((text (random-elt (vector-ref objects-texts num))))
-          (let loop ((ev (poll-event!)))
-            (reset-movement!)
-            (show-formated-text! text)
-            (render-present! *renderer*)
-            (unless (and (keyboard-event? ev) (keyboard-event-state ev) (eq? 'space (keyboard-event-scancode ev)))
-              (loop (poll-event!)))))
-        (set! *user-choices*
-          (cons num (delete num *user-choices*)))))))
+  (set! *user-choices* (cons (scene-object-number obj) *user-choices*)))
 
 (define (show-object! obj)
   (let* ((x (scene-object-position obj))
@@ -86,16 +82,23 @@
                   #f
                   (make-rect user-x 0 (texture-w tex) (texture-h tex)))
     (when (and (eq? obj (find-object-at-player))
-               (not (member num *user-choices*)))
+               (not (member num *user-choices*))
+               (not (turn-finished?)))
       (show-boxed-text! text-x text-y name small-box))))
 
 (define (show-filler! flr)
   (let* ((x (scene-filler-position flr))
-         (tex (scene-filler-texture flr)))
+         (tex (scene-filler-texture flr))
+         (user-x (round (- x *view-position*))))
     (render-copy! *renderer*
                   tex
                   #f
-                  (make-rect (round (- x *view-position*)) 0 (texture-w tex) (texture-h tex)))))
+                  (make-rect user-x 0 (texture-w tex) (texture-h tex)))
+    (when (and (eq? tex bed-texture)
+               (turn-finished?)
+               (<= x *player-position* (+ x (texture-w tex))))
+      (show-boxed-text! (round (+ user-x (/ (texture-w tex) 2) (/ (- (* character-width 3)) 2)))
+                        (+ ceiling-y 20) "Bed" small-box))))
 
 (define (show-scene!)
   (for-each
@@ -122,6 +125,10 @@
 
 (define (find-object-at-player)
   (find-object-at
+   (+ *player-position* (/ player-width 2))))
+
+(define (find-filler-at-player)
+  (find-filler-at
    (+ *player-position* (/ player-width 2))))
 
 (define (show-player!)
@@ -174,18 +181,51 @@
         (print "You win!")
         (cont))))
 
-(let loop ((lt (get-ticks)))
+(define (default-game-state dt)
+  (move-player! dt)
+  (show-scene!)
+  (show-player!)
+  (cond ((and *player-interacting*
+              (turn-finished?)
+              (eq? (scene-filler-texture (find-filler-at-player)) bed-texture))
+         (make-end-turn-game-state))
+        ((and *player-interacting* (allowed-interaction? (find-object-at-player)))
+         (make-interaction-game-state (find-object-at-player)))
+        (else
+         default-game-state)))
+
+(define (make-interaction-game-state obj)
+  (let* ((num (scene-object-number obj))
+         (texts (vector-ref objects-texts num))
+         (text (random-elt texts)))
+    (reset-movement!)
+    (register-choice! obj)
+    (let state ((dt 0))
+      (show-scene!)
+      (show-player!)
+      (show-formated-text! text)
+      (if *player-interacting*
+          (begin (reset-movement!) default-game-state)
+          state))))
+
+(define (make-end-turn-game-state)
+  (reset-movement!)
+  (let ((good-objects (interact *user-choices*)))
+    (let state ((dt 0))
+      (show-text! 0 0 (sprintf "Good-objects: ~A" good-objects) text-font '(255 255 255))
+      (if *player-interacting*
+          (begin (reset-movement!)
+                 (set! *user-choices* '())
+                 default-game-state)
+          state))))
+
+(define (main-loop state lt)
   (let* ((ct (get-ticks))
          (dt (/ (- ct lt) 1000)))
-    (handle-events!)
-    (move-player! dt)
-    (when *player-interacting*
-      (register-choice! (find-object-at-player)))
+    (render-present! *renderer*)
     (set! (render-draw-color *renderer*) (make-color 0 0 0))
     (render-clear! *renderer*)
-    (show-scene!)
-    (show-player!)
-    (render-present! *renderer*)
-    (if (= (length *user-choices*) num-choices)
-        (check-user-choices! (lambda () (loop ct)))
-        (loop ct))))
+    (handle-events!)
+    (main-loop (state dt) ct)))
+
+(main-loop default-game-state (get-ticks))

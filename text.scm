@@ -21,6 +21,8 @@
            (+ first-capital (- n (char->integer #\A))))
           ((<= (char->integer #\a) n (char->integer #\z))
            (+ first-normal (- n (char->integer #\a))))
+          ((<= (char->integer #\0) n (char->integer #\9))
+           (+ first-number (- n (char->integer #\0))))
           ((= n (char->integer #\space))
            first-special)
           ((= n (char->integer #\,))
