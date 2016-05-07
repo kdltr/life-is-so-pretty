@@ -71,30 +71,24 @@
             "You eat one of the pills\n\"…Why didn't they do it in strawberry taste…?\""
             "You water your plant. At least, it didn't bother you. It lays here, doing nothing but eat oxygen and light.")))
 
-(define (random-object)
-  (random (vector-length objects-name)))
-
-#;
-(define scene
-  (let loop ((n 0)
-             (last-x 10))
-    (if (= n num-objects)
-        '()
-        (let* ((obj (random-object))
-               (tex (vector-ref objects-texture obj)))
-          (cons (make-scene-object obj last-x)
-                (loop (add1 n) (+ last-x (texture-w tex))))))))
-
-(define scene
+(define (random-scene)
   (cons*
    (make-scene-filler window-texture 0)
    (let loop ((rest (permutation (iota (vector-length objects-name))))
-              (last-x (texture-w window-texture)))
-     (if (null? rest)
-         (list (make-scene-filler door-texture last-x))
-         (cons
-          (make-scene-object (car rest) last-x)
-          (loop (cdr rest) (+ last-x (texture-w (vector-ref objects-texture (car rest))))))))))
+              (last-x (texture-w window-texture))
+              (place-bed? #t))
+     (cond ((or (and (null? rest) place-bed?)
+                (and place-bed? (eq? 0 (random 10))))
+            (cons (make-scene-filler bed-texture last-x)
+                  (loop rest (+ last-x (texture-w bed-texture)) #f)))
+           ((null? rest)
+            (list (make-scene-filler door-texture last-x)))
+           (else
+            (cons
+             (make-scene-object (car rest) last-x)
+             (loop (cdr rest) (+ last-x (texture-w (vector-ref objects-texture (car rest)))) place-bed?)))))))
+
+(define scene (random-scene))
 
 (define (find-object-at x)
   (find

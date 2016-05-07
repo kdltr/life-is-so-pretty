@@ -159,9 +159,11 @@
                   (set! *player-right* (keyboard-event-state ev)))
              (and (eq? (keyboard-event-scancode ev) 'escape)
                   (exit 0))
-             (and (eq? (keyboard-event-scancode ev) 'space)
+             (and (eq? (keyboard-event-scancode ev) 'r)
                   (keyboard-event-state ev)
-                  (set! *player-interacting* #t))))
+                  (set! scene (random-scene)))
+             (and (eq? (keyboard-event-scancode ev) 'space)
+                  (set! *player-interacting* (keyboard-event-state ev)))))
     (and ev (loop (poll-event!)))))
 
 (define (check-user-choices! cont)
