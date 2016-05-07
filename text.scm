@@ -8,6 +8,8 @@
 (define character-width 6)
 (define character-height 14)
 
+(define maximum-text-width 40)
+
 (define first-capital 0)
 (define first-normal (+ first-capital 26))
 (define first-number (+ first-normal 26))
@@ -78,9 +80,11 @@
       (loop (cdr chars) (+ x character-width)))))
 
 (define (show-boxed-text! x y str box-font #!optional (color '(0 0 0)))
+  (show-boxed-lines! x y (string-split str "\n") box-font color))
+
+(define (show-boxed-lines! x y lines box-font #!optional (color '(0 0 0)))
   (let* ((box-x (- x character-width))
          (box-y (- y character-height))
-         (lines (string-split str "\n"))
          (max-len (fold (lambda (s n) (max (string-length s) n)) 0 lines)))
     (show-lines!
      box-x box-y
@@ -97,5 +101,21 @@
       (show-text! x y (car rest) font color)
       (loop (cdr rest) (+ y character-height)))))
 
+(define (format text chars accum)
+  (cond ((null? text)
+         (list (reverse accum)))
+        ((> (+ chars (string-length (car text))) maximum-text-width)
+         (cons (reverse accum) (format text 0 '())))
+        (else
+         (format (cdr text) (+ chars (string-length (car text))) (cons (car text) accum)))))
+
 (define (show-formated-text! str)
-  (show-boxed-text! 20 (+ ceiling-y 20) str big-box))
+  (let* ((lines (string-split str "\n"))
+         (words (map (cut string-split <> " ") lines))
+         (lines (append-map (cut format <> 0 '()) words))
+         (lines (map string-intersperse lines))
+         (max-width (fold (lambda (s n) (max (string-length s) n)) 0 lines)))
+    (show-boxed-lines! (round (- (/ width 2) (/ (* max-width character-width) 2)))
+                       (+ ceiling-y 20)
+                       lines
+                       big-box)))
