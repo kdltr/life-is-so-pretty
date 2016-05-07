@@ -53,14 +53,23 @@
           "meds"))
 
 (define objects-texts
-  (vector '("You watch some porn. You take some pleasure at it.")
-          '("You savagely punch your poor teddy bear. You feel a little guilty.\n\"…Why did I do this?\"")
-          '("You take some random book in the shelf. \"Les Fleurs du Mal\" from Charles Baudelaire. It feels like he's talking directely to your heart whith his poetry.")
-          '("The phone is ringing. You answer it. It's some random classmate.\n\"Hi? Yeah. Whatever. Thanks for calling, I guess… Bye.\"")
-          '("Some music is playing. You move your head in rhythm.\n\"I like this song so much!\"")
-          '("You play some random anime.\n\"Well, that is cool! I can't wait for the next episode to come!\"")
-          '("You lay down and spend some time doing nothing…")
-          '("You stare at the box of medicine.\n\"Do I Really need to take these?\"")))
+  (vector '("You watch some porn.\nYou take some pleasure at it."
+            "You spend some time trashtalking some My Little Pony fans, and post hateful comments under a young broadcaster's videos.")
+          '("You savagely punch your poor teddy bear.\nYou feel a little guilty.\n\"…Why did I do this?\""
+            "You deeply hug your teddy bear. The softeness of his fabric makes you feel safe for a couple of minutes.")
+          '("You take some random book in the shelf.\n\"Les Fleurs du Mal\" from Charles Baudelaire.\nIt feels like he's talking directely to your heart with his poetry.")
+          '("The phone is ringing. You answer it. It's some random classmate.\n\"Hi? Yeah. Whatever. Thanks for calling, I guess… Bye.\""
+            "The phone is ringing. You pick it up. It's an advertiser who sells windows. You hang up immediately and sigh.")
+          '("Some music is playing. You move your head in rhythm.\n\"I like this song so much!\""
+            "You switch on the radio. It's filled with informations from the world. The world seems collapsing. Peapole are starving, wars are starting, nature is diying, and politics are doing nothing about it. You turn it off, you don't care anyway.")
+          '("You play some random anime.\n\"Well, that is cool! I can't wait for the next episode to come!\""
+            "You switch on the TV and play to video games. You die many times.\n\"Fuck this shit ! I'm tired of loosing... Well. Next time can only be a better run !\"")
+          '("You lay down and spend some time doing nothing…"
+            "You spend some time daydreaming to a better life, where everything is better.")
+          '("You stare at the box of medicine.\n\"Do I Really need to take these?\""
+            "You stare at the box of meds.\n\"I'm pretty sure it's ineffective…\""
+            "You eat one of the pills\n\"…Why didn't they do it in strawberry taste…?\""
+            "You water your plant. At least, it didn't bother you. It lays here, doing nothing but eat oxygen and light.")))
 
 (define (random-object)
   (random (vector-length objects-name)))

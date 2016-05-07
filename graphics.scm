@@ -62,12 +62,13 @@
     (let* ((num (scene-object-number obj))
            (already-checked? (member num *user-choices*)))
       (unless already-checked?
-        (let loop ((ev (poll-event!)))
-          (reset-movement!)
-          (show-formated-text! (car (vector-ref objects-texts num)))
-          (render-present! *renderer*)
-          (unless (and (keyboard-event? ev) (keyboard-event-state ev) (eq? 'space (keyboard-event-scancode ev)))
-            (loop (poll-event!))))
+        (let ((text (random-elt (vector-ref objects-texts num))))
+          (let loop ((ev (poll-event!)))
+            (reset-movement!)
+            (show-formated-text! text)
+            (render-present! *renderer*)
+            (unless (and (keyboard-event? ev) (keyboard-event-state ev) (eq? 'space (keyboard-event-scancode ev)))
+              (loop (poll-event!)))))
         (set! *user-choices*
           (cons num (delete num *user-choices*)))))))
 
@@ -116,7 +117,8 @@
 
 (define (reset-movement!)
   (set! *player-left* #f)
-  (set! *player-right* #f))
+  (set! *player-right* #f)
+  (set! *player-interacting* #f))
 
 (define (find-object-at-player)
   (find-object-at
@@ -176,8 +178,7 @@
     (handle-events!)
     (move-player! dt)
     (when *player-interacting*
-      (register-choice! (find-object-at-player))
-      (set! *player-interacting* #f))
+      (register-choice! (find-object-at-player)))
     (set! (render-draw-color *renderer*) (make-color 0 0 0))
     (render-clear! *renderer*)
     (show-scene!)
