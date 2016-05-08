@@ -1,6 +1,14 @@
 ;; sounds
 
+(define empty-room-sound
+  (mix:load-wav "empty-room.wav"))
 
+(print (get-error))
+
+(define dark-ambiance-sound
+  (mix:load-wav "dark-ambiance.wav"))
+
+(print (get-error))
 
 
 ;; images
