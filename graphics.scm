@@ -5,7 +5,10 @@
      miscmacros
      vector-lib
      utf8
-     srfi-1)
+     srfi-1
+     (only color color->L*C*h L*C*h->color color->sRGB sRGB->color)
+     (prefix sdl2-mixer mix:)
+     posix)
 
 (include "helpers")
 (include "proto.scm")
@@ -33,6 +36,8 @@
 (set-main-ready!)
 (init!)
 (img:init! '(png))
+(mix:init!)
+(mix:open-audio!)
 
 (set-hint! 'render-vsync "0")
 (set-hint! 'render-scale-quality "0")
@@ -47,8 +52,9 @@
 
 ;; Library
 
+(include "resources")
 (include "objects")
-(include "text.scm")
+(include "text")
 
 (define room-width
   (let* ((last-obj (last scene))
@@ -118,10 +124,6 @@
            ((scene-object? elm) (show-object! elm ending))))
    scene))
 
-(define player-left-texture
-  (create-texture-from-surface *renderer* (img:load "player-left.png")))
-(define player-right-texture
-  (create-texture-from-surface *renderer* (img:load "player-right.png")))
 (define *player-left* #f)
 (define *player-right* #f)
 (define *player-interacting* #f)
@@ -165,6 +167,7 @@
       (set! *view-position* (+ *view-position* factor)))
     (when (< *player-position* (+ *view-position* view-border))
       (set! *view-position* (- *view-position* factor)))))
+
 
 ;; ===
 
@@ -213,18 +216,30 @@
 
 (define (make-end-turn-game-state)
   (reset-movement!)
-  (let ((good-objects (interact *user-choices*)))
+  (let* ((good-objects (interact *user-choices*))
+         (dreams (take (permutation dream-textures) good-objects))
+         (nightmares (take (permutation nightmare-textures) (- num-choices good-objects)))
+         (items (permutation (append dreams nightmares)))
+         (clock 0))
     (rec (state dt)
-         (show-text! 0 0 (sprintf "Good-objects: ~A" good-objects) text-font '(255 255 255))
+         (render-copy! *renderer* sleep-texture)
+         (render-copy! *renderer* (car items) #f (make-rect 0 (round (* 2 (sin (* clock 3)))) width height))
+         (set! clock (+ clock dt))
          (if *player-interacting*
-             (begin (reset-movement!)
-                    (set! *user-choices* '())
-                    (cond ((= good-objects num-choices)
-                           (make-last-action-state 'good door-texture))
-                          ((<= life 0)
-                           (make-last-action-state 'bad window-texture))
-                          (else
-                           default-game-state)))
+             (if (null? (cdr items))
+                 (begin (reset-movement!)
+                        (set! *user-choices* '())
+                        (cond ((= good-objects num-choices)
+                               (make-last-action-state 'good door-texture))
+                              ((<= life 0)
+                               (make-last-action-state 'bad window-texture))
+                              (else
+                               default-game-state)))
+                 (begin
+                   (reset-movement!)
+                   (set! clock 0)
+                   (set! items (cdr items))
+                   state))
              state))))
 
 (define (make-last-action-state ending clickable-texture)

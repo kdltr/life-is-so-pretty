@@ -1,37 +1,6 @@
 (define-record scene-object number position)
 (define-record scene-filler texture position)
 
-
-;; fillers
-
-(define window-texture
-  (create-texture-from-surface *renderer* (img:load "window.png")))
-(define door-texture
-  (create-texture-from-surface *renderer* (img:load "door.png")))
-
-
-;; proper objects
-
-(define bed-texture
-  (create-texture-from-surface *renderer* (img:load "bed.png")))
-(define computer-texture
-  (create-texture-from-surface *renderer* (img:load "computer.png")))
-(define plush-texture
-  (create-texture-from-surface *renderer* (img:load "plush.png")))
-(define bookcase-texture
-  (create-texture-from-surface *renderer* (img:load "bookcase.png")))
-(define telephone-texture
-  (create-texture-from-surface *renderer* (img:load "telephone.png")))
-(define radio-texture
-  (create-texture-from-surface *renderer* (img:load "radio.png")))
-(define television-texture
-  (create-texture-from-surface *renderer* (img:load "television.png")))
-(define sofa-texture
-  (create-texture-from-surface *renderer* (img:load "sofa.png")))
-(define meds-texture
-  (create-texture-from-surface *renderer* (img:load "meds.png")))
-
-
 (define objects-texture
   (vector computer-texture
           plush-texture
@@ -54,18 +23,39 @@
 
 (define objects-texts
   (vector '("You watch some porn.\nYou take some pleasure at it."
-            "You spend some time trashtalking some My Little Pony fans, and post hateful comments under a young broadcaster's videos.")
+            "You spend some time trashtalking some My Little Pony fans, and post hateful comments under a young broadcaster's videos."
+            "Tu trouves la vidéo d'un petit chaton trop mignon qui se casse la gueule. Ca te fais bien marrer. Tu perds un temps fou à en regarder d'autres."
+            "Tu joues à un jeu dans lequel tu incarnes une créature avec des pouvoirs surnaturels, qui monte avec un ami, une équipe de secours pour sauver les autres créatures qui ont des problèmes.")
+
+          
           '("You savagely punch your poor teddy bear.\nYou feel a little guilty.\n\"…Why did I do this?\""
-            "You deeply hug your teddy bear. The softeness of his fabric makes you feel safe for a couple of minutes.")
-          '("You take some random book in the shelf.\n\"Les Fleurs du Mal\" from Charles Baudelaire.\nIt feels like he's talking directely to your heart with his poetry.")
+            "You deeply hug your teddy bear. The softeness of his fabric makes you feel safe for a couple of minutes."
+            "Tu enfouies ton visage dans la peluche et hurles à pleins poumons pendant de longues secondes.")
+
+          
+          '("You take some random book in the shelves.\n\"Les Fleurs du Mal\" from Charles Baudelaire.\nIt feels like he's talking directely to your heart with his poetry."
+            "Tu ouvres un manga appellé \"Fullmetal Alchemist.\" Il parle d'un garçon capable de façonner la matière comme il le désire, qui se bat contre des êtres artificiels. \"Est ce que cela serait possible en vrai ?\""
+            "Tu t'évades en lisant \"Treasure Island\" de Robert Louis Stevenson, dont l'histoire te fais rêver de liberté, d'alcool, de femmes et de trésors millénaires.")
+
+          
           '("The phone is ringing. You answer it. It's some random classmate.\n\"Hi? Yeah. Whatever. Thanks for calling, I guess… Bye.\""
             "The phone is ringing. You pick it up. It's an advertiser who sells windows. You hang up immediately and sigh.")
-          '("Some music is playing. You move your head in rhythm.\n\"I like this song so much!\""
+
+          
+          '("Some music is playing. You move your head in rhythm.\n\"That's a nice song…\""
             "You switch on the radio. It's filled with informations from the world. The world seems collapsing. Peapole are starving, wars are starting, nature is diying, and politics are doing nothing about it. You turn it off, you don't care anyway.")
+
+          
           '("You play some random anime.\n\"Well, that is cool! I can't wait for the next episode to come!\""
-            "You switch on the TV and play to video games. You die many times.\n\"Fuck this shit ! I'm tired of loosing... Well. Next time can only be a better run !\"")
+            "You switch on the TV and play to video games. You die many times.\n\"Fuck this shit ! I'm tired of loosing... Well. Next time can only be a better run !\""
+            "Tu regardes un anime dans lequel le personnage principal devient invisible aux yeux de tous. Malgré tous ses efforts, il lui est impossible de communiquer avec quiconque. Quelques larmes coulent sur tes joues."
+            "Tu joues à un jeu vidéo dans lequelle une fille est capable de remonter le temps pour changer ce qu'elle veut dans sa vie, sauver ses amis et même faire le bien autour d'elle.")
+
+          
           '("You lay down and spend some time doing nothing…"
             "You spend some time daydreaming to a better life, where everything is better.")
+
+          
           '("You stare at the box of medicine.\n\"Do I Really need to take these?\""
             "You stare at the box of meds.\n\"I'm pretty sure it's ineffective…\""
             "You eat one of the pills\n\"…Why didn't they do it in strawberry taste…?\""
