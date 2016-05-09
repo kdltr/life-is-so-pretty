@@ -292,9 +292,9 @@
                         (cond ((= good-objects num-choices)
                                (mix:volume-chunk! dark-ambiance-sound 0)
                                (mix:volume-chunk! empty-room-sound 128)
-                               (make-last-action-state 'good door-texture))
+                               (make-last-action-state 'good door-texture good-end-screen-state))
                               ((<= life 0)
-                               (make-last-action-state 'bad window-texture))
+                               (make-last-action-state 'bad window-texture bad-end-screen-state))
                               (else
                                default-game-state)))
                  (begin
@@ -304,7 +304,7 @@
                    state))
              state))))
 
-(define (make-last-action-state ending clickable-texture)
+(define (make-last-action-state ending clickable-texture next-state)
   (rec (state dt)
        (move-player! dt)
        (show-scene! ending)
@@ -313,8 +313,20 @@
               (tex (and obj (scene-filler-texture obj))))
          (if (and *player-interacting*
                   (eq? tex clickable-texture))
-             (lambda (dt) (exit 0))
+             (begin (reset-movement!) next-state)
              state))))
+
+(define (good-end-screen-state dt)
+  (show-formated-text! "Filled with determination, you take a large breath before taking your first step long since out of this room.\nThe world shines around you, it was waiting for you.")
+  (if *player-interacting*
+      (lambda (dt) (exit 0))
+      good-end-screen-state))
+
+(define (bad-end-screen-state dt)
+  (show-formated-text! "When you open the window, a gust of wind blows your hair away. You take a look down, you're not reassured.\nYou raise your eyes to the sky.\nA flock of bird flies away.\nYou join them…")
+  (if *player-interacting*
+      (lambda (dt) (exit 0))
+      bad-end-screen-state))
 
 (define (introduction-game-state dt)
   (show-formated-text! "Welcome…\nPress A and D to move around and space to interact with your environment.\nPress escape at anytime to give up.")

@@ -120,10 +120,10 @@
 
 (define sleep-frames
   (circular-list
-   (cons 2.0 (first sleep-textures))
+   (cons 1.8 (first sleep-textures))
    (cons 1.0 (second sleep-textures))
-   (cons 1.5 (third sleep-textures))
-   (cons 0.5 (second sleep-textures))))
+   (cons 1.2 (third sleep-textures))
+   (cons 0.2 (second sleep-textures))))
 
 (define player-left-frames
   (circular-list
