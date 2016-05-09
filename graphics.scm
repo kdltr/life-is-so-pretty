@@ -262,6 +262,13 @@
              (lambda (dt) (exit 0))
              state))))
 
+(define (introduction-game-state dt)
+  (show-formated-text! "Welcome…\nPress A and D to move around and space to interact with your environment.\nPress escape at anytime to give up.")
+  (if *player-interacting*
+      (begin (reset-movement!) default-game-state)
+      introduction-game-state))
+
+
 (define (main-loop state lt)
   (let* ((ct (get-ticks))
          (dt (/ (- ct lt) 1000)))
@@ -271,8 +278,12 @@
     (handle-events!)
     (main-loop (state dt) ct)))
 
+
+;; Init
+
 (mix:volume-chunk! empty-room-sound 128)
 (mix:volume-chunk! dark-ambiance-sound 0)
 (mix:play-channel! 0 empty-room-sound -1)
 (mix:play-channel! 1 dark-ambiance-sound -1)
-(main-loop default-game-state (get-ticks))
+
+(main-loop introduction-game-state (get-ticks))
