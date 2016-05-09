@@ -42,12 +42,16 @@
   (desaturate-color (surface-ref source i j)))))
   result))
 
+(define (textures-from l)
+  (map
+   (lambda (f)
+     (create-texture-from-surface *renderer* (img:load f)))
+   l))
 
-(define player-left-surface (desaturate (img:load "player-left.png")))
-(define player-left-texture (create-texture-from-surface *renderer* player-left-surface))
 
-(define player-right-surface (desaturate (img:load "player-right.png")))
-(define player-right-texture (create-texture-from-surface *renderer* player-right-surface))
+(define player-left-textures (textures-from (sort (glob "player-left*") string<?)))
+(define player-right-textures (textures-from (sort (glob "player-right*") string<?)))
+
 
 (define window-surface* (desaturate (img:load "window.png")))
 (define window-texture (create-texture-from-surface *renderer* window-surface*))
@@ -100,21 +104,14 @@
 
 ;; dreams
 
-(define sleep-textures
-  (map (lambda (f) (create-texture-from-surface *renderer* (img:load f))) (sort (glob "sleep*") string<?)))
-
-(define dream-textures
-  (map (lambda (f) (create-texture-from-surface *renderer* (img:load f))) (glob "dream*")))
-
-(define nightmare-textures
-  (map (lambda (f) (create-texture-from-surface *renderer* (img:load f))) (glob "nightmare*")))
-
+(define sleep-textures (textures-from (sort (glob "sleep*") string<?)))
+(define dream-textures (textures-from (glob "dream*")))
+(define nightmare-textures (textures-from (glob "nightmare*")))
 
 
 (define all-textures
   (list window-texture door-texture bed-texture computer-texture plush-texture bookcase-texture
         telephone-texture radio-texture television-texture sofa-texture meds-texture
-        player-left-texture player-right-texture
         pants-texture clock-texture pizza-texture crack-texture plug-texture))
 
 
@@ -127,3 +124,17 @@
    (cons 1.0 (second sleep-textures))
    (cons 1.5 (third sleep-textures))
    (cons 0.5 (second sleep-textures))))
+
+(define player-left-frames
+  (circular-list
+   (cons 0.30 (first player-left-textures))
+   (cons 0.25 (second player-left-textures))
+   (cons 0.30 (first player-left-textures))
+   (cons 0.25 (third player-left-textures))))
+
+(define player-right-frames
+  (circular-list
+   (cons 0.30 (first player-right-textures))
+   (cons 0.25 (second player-right-textures))
+   (cons 0.30 (first player-right-textures))
+   (cons 0.25 (third player-right-textures))))

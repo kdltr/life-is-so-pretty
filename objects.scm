@@ -28,7 +28,7 @@
             "You start up a game in which you play a little creature gifted with supernatural powers that, with a friend, puts up a rescue team to help other creatures in danger.")
 
           
-          '("You savagely punch your poor teddy bear.\nYou feel a bit guilty.\n\"…Why would I do this?\""
+          '("You savagely punch your poor teddy bear.\nYou feel a bit guilty.\n\"…What have I done?\""
             "You deeply hug your teddy bear. The softeness of the fabric makes you feel safe for a couple of minutes."
             "You burrow your face in the plush and cry out in despair for long minutes.")
 

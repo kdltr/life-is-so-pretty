@@ -23,11 +23,11 @@
 (define object-width 20)
 (define object-height 50)
 
-(define player-speed 150)
-(define player-width 23)
+(define player-speed 100)
+(define player-width 40)
 (define player-height 79)
 
-(define view-border (+ (/ player-width 2) 40))
+(define view-border (+ (/ player-width 2) 33))
 
 (define ceiling-y 30)
 (define floor-y 150)
@@ -130,12 +130,15 @@
 (define *player-right* #f)
 (define *player-interacting* #f)
 (define *player-position* (- (/ width 2) (/ player-width 2)))
-(define *player-texture* player-right-texture)
+(define *player-clock* 0)
+(define *player-frames* player-right-frames)
+(define *frame-orientation* 'right)
 (define *view-position* 0)
 
 (define (reset-movement!)
   (set! *player-left* #f)
   (set! *player-right* #f)
+  (set! *player-clock* 0)
   (set! *player-interacting* #f))
 
 (define (find-object-at-player)
@@ -148,7 +151,7 @@
 
 (define (show-player!)
   (render-copy! *renderer*
-                *player-texture*
+                (cdar *player-frames*)
                 #f
                 (make-rect (floor (- *player-position* *view-position*))
                                 (- floor-y player-height)
@@ -157,12 +160,26 @@
 
 (define (move-player! dt)
   (let* ((factor (* player-speed dt))
+         (clk (+ *player-clock* dt))
+         (frame (car *player-frames*))
+         (time (car frame))
          (increment (+ (if *player-left* (- factor) 0)
                        (if *player-right* factor 0))))
-    (set! *player-texture*
-      (cond ((< increment 0) player-left-texture)
-            ((> increment 0) player-right-texture)
-            (else *player-texture*)))
+    (if (>= clk time)
+        (begin (set! *player-frames* (cdr *player-frames*))
+               (set! *player-clock* 0))
+        (set! *player-clock* clk))
+    (when (and *player-left* (eq? *frame-orientation* 'right))
+      (set! *frame-orientation* 'left)
+      (set! *player-frames* player-left-frames)
+      (set! *player-clock* 0.3))
+    (when (and *player-right* (eq? *frame-orientation* 'left))
+      (set! *frame-orientation* 'right)
+      (set! *player-frames* player-right-frames)
+      (set! *player-clock* 0.3))
+    (when (not (or *player-left* *player-right*))
+      (set! *player-frames* (if (= (car frame) 0.3) *player-frames* (cdr *player-frames*)))
+      (set! *player-clock* 0.250))
     (set! *player-position*
       (min (- room-width player-width 55) (max 56 (+ *player-position* increment))))
     (when (> *player-position* (+ *view-position* (- width player-width view-border)))
