@@ -23,43 +23,43 @@
 
 (define objects-texts
   (vector '("You watch some porn.\nYou take some pleasure at it."
-            "You spend some time trashtalking some My Little Pony fans, and post hateful comments under a young broadcaster's videos."
-            "Tu trouves la vidéo d'un petit chaton trop mignon qui se casse la gueule. Ca te fais bien marrer. Tu perds un temps fou à en regarder d'autres."
-            "Tu joues à un jeu dans lequel tu incarnes une créature avec des pouvoirs surnaturels, qui monte avec un ami, une équipe de secours pour sauver les autres créatures qui ont des problèmes.")
+            "You spend some time trashtalking some My Little Pony fans. You also obnoxiously comment videos from a young broadcaster."
+            "You come across upon a video showing a cute kitten falling flat on his face, it makes you laugh.\nYou spend an awful lot of time watching others."
+            "You start up a game in which you play a little creature gifted with supernatural powers that, with a friend, puts up a rescue team to help other creatures in danger.")
 
           
-          '("You savagely punch your poor teddy bear.\nYou feel a little guilty.\n\"…Why did I do this?\""
-            "You deeply hug your teddy bear. The softeness of his fabric makes you feel safe for a couple of minutes."
-            "Tu enfouies ton visage dans la peluche et hurles à pleins poumons pendant de longues secondes.")
+          '("You savagely punch your poor teddy bear.\nYou feel a bit guilty.\n\"…Why would I do this?\""
+            "You deeply hug your teddy bear. The softeness of the fabric makes you feel safe for a couple of minutes."
+            "You burrow your face in the plush and cry out in despair for long minutes.")
 
           
-          '("You take some random book in the shelves.\n\"Les Fleurs du Mal\" from Charles Baudelaire.\nIt feels like he's talking directely to your heart with his poetry."
-            "Tu ouvres un manga appellé \"Fullmetal Alchemist.\" Il parle d'un garçon capable de façonner la matière comme il le désire, qui se bat contre des êtres artificiels. \"Est ce que cela serait possible en vrai ?\""
-            "Tu t'évades en lisant \"Treasure Island\" de Robert Louis Stevenson, dont l'histoire te fais rêver de liberté, d'alcool, de femmes et de trésors millénaires.")
+          '("You take some random book in the shelves.\n\"Les Fleurs du Mal\" from Charles Baudelaire.\nIt feels like his poetry is talking directely to your heart."
+            ;; "Tu ouvres un manga appellé \"Fullmetal Alchemist.\" Il parle d'un garçon capable de façonner la matière comme il le désire, qui se bat contre des êtres artificiels. \"Est ce que cela serait possible en vrai ?\""
+            "You escape for a while by reading \"Treasure Island\" by Robert Louis Stevenson.\nThis story sparks off some dreams about freedom, alcohol and thousands-years-old treasures.")
 
           
           '("The phone is ringing. You answer it. It's some random classmate.\n\"Hi? Yeah. Whatever. Thanks for calling, I guess… Bye.\""
-            "The phone is ringing. You pick it up. It's an advertiser who sells windows. You hang up immediately and sigh.")
+            "The phone is ringing. You pick it up. It's a dealer who sells windows. You hang up immediately and sigh.")
 
           
           '("Some music is playing. You move your head in rhythm.\n\"That's a nice song…\""
-            "You switch on the radio. It's filled with informations from the world. The world seems collapsing. Peapole are starving, wars are starting, nature is diying, and politics are doing nothing about it. You turn it off, you don't care anyway.")
+            "You switch on the radio. It's filled with informations from the world. It sounds like it's collapsing. People are starving, wars are breaking out, nature is diying. Politics are not doing anything about it. You turn it off, you don't care anyway.")
 
           
-          '("You play some random anime.\n\"Well, that is cool! I can't wait for the next episode to come!\""
-            "You switch on the TV and play to video games. You die many times.\n\"Fuck this shit ! I'm tired of loosing... Well. Next time can only be a better run !\""
-            "Tu regardes un anime dans lequel le personnage principal devient invisible aux yeux de tous. Malgré tous ses efforts, il lui est impossible de communiquer avec quiconque. Quelques larmes coulent sur tes joues."
-            "Tu joues à un jeu vidéo dans lequelle une fille est capable de remonter le temps pour changer ce qu'elle veut dans sa vie, sauver ses amis et même faire le bien autour d'elle.")
+          '("You watch some random anime.\n\"Well, that is cool! I can't wait for the next episode to come out!\""
+            "You switch on the TV and play video games.\nYou die many times.\n\"Fuck this shit! I'm tired of loosing…\""
+            "You watch an anime where the main character becomes invisible. Despite his best efforts, he's unable to communicate with anyone. A few tears roll on your cheeks."
+            "You fire up a game. It's about a girl able to rewind time to change anything she wants in her life, save her friends and do good around her.")
 
           
           '("You lay down and spend some time doing nothing…"
-            "You spend some time daydreaming to a better life, where everything is better.")
+            "You spend some time daydreaming about a better life, where everything is better.")
 
           
           '("You stare at the box of medicine.\n\"Do I Really need to take these?\""
-            "You stare at the box of meds.\n\"I'm pretty sure it's ineffective…\""
-            "You eat one of the pills\n\"…Why didn't they do it in strawberry taste…?\""
-            "You water your plant. At least, it didn't bother you. It lays here, doing nothing but eat oxygen and light.")))
+            "You stare at the box of meds.\n\"I'm pretty sure they're ineffective…\""
+            "You eat one pill.\n\"Why doesn't it taste like strawberry…?\""
+            "You water your plant. At least it doesn't bother you. It just lays there, doing nothing but eat oxygen and light.")))
 
 (define (random-scene)
   (cons*
