@@ -62,10 +62,23 @@
             "You water your plant. At least it doesn't bother you. It just lays there, doing nothing but eat oxygen and light.")))
 
 (define end-turn-phrases
-  '("It's late, I should go to bed."
-    "I'm tired now…"
-    "Now is not a good time…"
-    "Maybe I can try that twomorrow."))
+  '("\"It's late, I should go to bed.\""
+    "\"I'm tired now…\""
+    "\"Now is not a good time…\""
+    "\"Maybe I can try that twomorrow.\""))
+
+(define good-end-phrases
+  '("\"What if I went outside instead?\""
+    "\"Let's visit some friends!\""
+    "\"Hey! Let's go to the park!\""
+    "\"It's been a while since I went to the pool.\""))
+
+(define bad-end-phrases
+  '("\"………\""
+    "\"I'm not in the mood…\""
+    "\"I really don't want to do that right now.\""
+    "\"I feel like crap…\""
+    "\"Doing this now is pointless…\""))
 
 (define (random-scene)
   (cons*

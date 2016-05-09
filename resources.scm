@@ -104,6 +104,7 @@
 (define dildo-surface (desaturate (img:load "dildo.png")))
 (define dildo-texture (create-texture-from-surface *renderer* dildo-surface))
 
+
 ;; dreams
 
 (define sleep-textures (textures-from (sort (glob "sleep*") string<?)))
@@ -111,10 +112,20 @@
 (define nightmare-textures (textures-from (glob "nightmare*")))
 
 
+
 (define all-textures
-  (list window-texture door-texture bed-texture computer-texture plush-texture bookcase-texture
-        telephone-texture radio-texture television-texture sofa-texture meds-texture
-        pants-texture clock-texture pizza-texture crack-texture plug-texture))
+  (append
+   player-left-textures player-right-textures
+   sleep-textures dream-textures nightmare-textures
+   (list window-texture door-texture bed-texture computer-texture plush-texture bookcase-texture
+         telephone-texture radio-texture television-texture sofa-texture meds-texture
+         pants-texture clock-texture pizza-texture crack-texture plug-texture)))
+
+(define (color-mod-all-textures! mod)
+  (for-each
+   (lambda (tex)
+     (set! (texture-color-mod tex) mod))
+   all-textures))
 
 
 (define all-fillers
