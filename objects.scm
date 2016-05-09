@@ -73,20 +73,24 @@
    (let loop ((rest (permutation (iota (vector-length objects-name))))
               (fillers-left (permutation all-fillers))
               (last-x (texture-w window-texture))
-              (place-bed? #t))
+              (place-bed? #t)
+              (place-dildo? #t))
      (cond ((or (and (null? rest) place-bed?)
                 (and place-bed? (zero? (random 10))))
             (cons (make-scene-filler bed-texture last-x)
-                  (loop rest fillers-left (+ last-x (texture-w bed-texture)) #f)))
+                  (loop rest fillers-left (+ last-x (texture-w bed-texture)) #f place-dildo?)))
            ((null? rest)
             (list (make-scene-filler door-texture last-x)))
+           ((and place-dildo? (zero? (random 200)))
+            (cons (make-scene-filler dildo-texture last-x)
+                  (loop rest fillers-left (+ last-x (texture-w dildo-texture)) place-bed? #f)))
            ((and (not (null? fillers-left)) (zero? (random 5)))
             (cons (make-scene-filler (car fillers-left) last-x)
-                  (loop rest (cdr fillers-left) (+ last-x (texture-w (car fillers-left))) place-bed?)))
+                  (loop rest (cdr fillers-left) (+ last-x (texture-w (car fillers-left))) place-bed? place-dildo?)))
            (else
             (cons
              (make-scene-object (car rest) last-x)
-             (loop (cdr rest) fillers-left (+ last-x (texture-w (vector-ref objects-texture (car rest)))) place-bed?)))))))
+             (loop (cdr rest) fillers-left (+ last-x (texture-w (vector-ref objects-texture (car rest)))) place-bed? place-dildo?)))))))
 
 (define scene (random-scene))
 

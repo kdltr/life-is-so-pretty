@@ -101,6 +101,8 @@
 (define plug-surface (desaturate (img:load "plug.png")))
 (define plug-texture (create-texture-from-surface *renderer* plug-surface))
 
+(define dildo-surface (desaturate (img:load "dildo.png")))
+(define dildo-texture (create-texture-from-surface *renderer* dildo-surface))
 
 ;; dreams
 
