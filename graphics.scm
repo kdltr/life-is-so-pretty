@@ -52,7 +52,7 @@
 ;;                             '(fullscreen)))
 
 (define *win*
-  (create-window! "Life Is So Pretty" 'undefined 'undefined window-width window-height '(fullscreen-desktop)))
+  (create-window! "Life Is So Pretty" 'undefined 'undefined window-width window-height '()))
 
 (define *renderer*
   (create-renderer! *win* -1 '(accelerated)))
@@ -207,9 +207,6 @@
                   (set! *player-right* (keyboard-event-state ev)))
              (and (eq? (keyboard-event-scancode ev) 'escape)
                   (exit 0))
-             (and (eq? (keyboard-event-scancode ev) 'r)
-                  (keyboard-event-state ev)
-                  (set! scene (random-scene)))
              (and (eq? (keyboard-event-scancode ev) 'space)
                   (set! *player-interacting* (keyboard-event-state ev)))))
     (and ev (loop (poll-event!)))))
