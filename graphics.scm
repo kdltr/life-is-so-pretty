@@ -1,6 +1,5 @@
 (use sdl2
      (prefix sdl2-image img:)
-     cairo
      clojurian-syntax
      miscmacros
      vector-lib
@@ -40,11 +39,20 @@
 (mix:init!)
 (mix:open-audio!)
 
-(set-hint! 'render-vsync "0")
+(set-hint! 'render-vsync "1")
 (set-hint! 'render-scale-quality "0")
 
+;; (define dm (make-display-mode))
+;; (SDL_GetDesktopDisplayMode 0 dm)
+
+;; (define win (create-window! "Crepes-party-hard-yolo-swag 2015"
+;;                             'undefined 'undefined
+;;                             (display-mode-w dm)
+;;                             (display-mode-h dm)
+;;                             '(fullscreen)))
+
 (define *win*
-  (create-window! "Blah" 'undefined 'undefined window-width window-height '()))
+  (create-window! "Life Is So Pretty" 'undefined 'undefined window-width window-height '(fullscreen-desktop)))
 
 (define *renderer*
   (create-renderer! *win* -1 '(accelerated)))

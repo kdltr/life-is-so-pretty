@@ -103,18 +103,18 @@
       (show-text! x y (car rest) font color)
       (loop (cdr rest) (+ y character-height)))))
 
-(define (format text chars accum)
+(define (format-lines text chars accum)
   (cond ((null? text)
          (list (reverse accum)))
         ((> (+ chars (string-length (car text))) maximum-text-width)
-         (cons (reverse accum) (format text 0 '())))
+         (cons (reverse accum) (format-lines text 0 '())))
         (else
-         (format (cdr text) (+ chars (string-length (car text))) (cons (car text) accum)))))
+         (format-lines (cdr text) (+ chars (string-length (car text))) (cons (car text) accum)))))
 
 (define (show-formated-text! str)
   (let* ((lines (string-split str "\n"))
          (words (map (cut string-split <> " ") lines))
-         (lines (append-map (cut format <> 0 '()) words))
+         (lines (append-map (cut format-lines <> 0 '()) words))
          (lines (map string-intersperse lines))
          (max-width (fold (lambda (s n) (max (string-length s) n)) 0 lines)))
     (show-boxed-lines! (round (- (/ width 2) (/ (* max-width character-width) 2)))
