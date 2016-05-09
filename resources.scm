@@ -13,7 +13,6 @@
 
 ;; images
 
-
 (define (color:scale-chroma color factor)
   (let* ((LCh (color->L*C*h color))
          (chroma (* (cadr LCh) factor)))
@@ -83,10 +82,21 @@
 (define meds-surface (desaturate (img:load "meds.png")))
 (define meds-texture (create-texture-from-surface *renderer* meds-surface))
 
-(define all-textures
-  (list window-texture door-texture bed-texture computer-texture plush-texture bookcase-texture
-        telephone-texture radio-texture television-texture sofa-texture meds-texture
-        player-left-texture player-right-texture))
+(define pants-surface (desaturate (img:load "pants.png")))
+(define pants-texture (create-texture-from-surface *renderer* pants-surface))
+
+(define clock-surface (desaturate (img:load "clock.png")))
+(define clock-texture (create-texture-from-surface *renderer* clock-surface))
+
+(define pizza-surface (desaturate (img:load "pizza.png")))
+(define pizza-texture (create-texture-from-surface *renderer* pizza-surface))
+
+(define crack-surface (desaturate (img:load "crack.png")))
+(define crack-texture (create-texture-from-surface *renderer* crack-surface))
+
+(define plug-surface (desaturate (img:load "plug.png")))
+(define plug-texture (create-texture-from-surface *renderer* plug-surface))
+
 
 ;; dreams
 
@@ -98,3 +108,17 @@
 
 (define nightmare-textures
   (map (lambda (f) (create-texture-from-surface *renderer* (img:load f))) (glob "nightmare*")))
+
+
+
+(define all-textures
+  (list window-texture door-texture bed-texture computer-texture plush-texture bookcase-texture
+        telephone-texture radio-texture television-texture sofa-texture meds-texture
+        sleep-texture
+        player-left-texture player-right-texture
+        pants-texture clock-texture pizza-texture crack-texture plug-texture))
+
+
+(define all-fillers
+  (list pants-texture pizza-texture crack-texture clock-texture plug-texture))
+

@@ -3,7 +3,6 @@
 (define num-objects 8)
 (define num-choices 4)
 (define max-life 12)
-;; palier
 
 (define (choose-good-objects n)
   (unless (= n 0)

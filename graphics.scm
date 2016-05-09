@@ -69,8 +69,9 @@
   (= (length *user-choices*) num-choices))
 
 (define (allowed-interaction? obj)
-  (and obj (scene-object? obj)
-       (not (member (scene-object-number obj) *user-choices*))))
+  (and (scene-object? obj)
+       (not (member (scene-object-number obj) *user-choices*))
+       obj))
 
 (define (register-choice! obj)
   (set! *user-choices* (cons (scene-object-number obj) *user-choices*)))
@@ -192,14 +193,34 @@
   (move-player! dt)
   (show-scene!)
   (show-player!)
-  (cond ((and *player-interacting*
-              (turn-finished?)
-              (aand (find-filler-at-player) (eq? (scene-filler-texture it) bed-texture)))
-         (make-end-turn-game-state))
-        ((and *player-interacting* (not (turn-finished?)) (allowed-interaction? (find-object-at-player)))
-         (make-interaction-game-state (find-object-at-player)))
+  (cond ((turn-finished?)
+         end-turn-game-state)
+        ((and *player-interacting* (allowed-interaction? (find-object-at-player))) =>
+         (cut make-interaction-game-state <>))
         (else
          default-game-state)))
+
+(define (end-turn-game-state dt)
+  (move-player! dt)
+  (show-scene!)
+  (show-player!)
+
+  (if *player-interacting*
+      (cond ((aand (find-filler-at-player) (eq? (scene-filler-texture it) bed-texture))
+             (make-dream-game-state))
+            ((find-object-at-player)
+             (let ((phrase (random-elt end-turn-phrases)))
+               (reset-movement!)
+               (rec (state dt)
+                    (show-scene!)
+                    (show-player!)
+                    (show-formated-text! phrase)
+                    (if *player-interacting*
+                        (begin (reset-movement!) end-turn-game-state)
+                        state))))
+            (else
+             end-turn-game-state))
+      end-turn-game-state))
 
 (define (make-interaction-game-state obj)
   (let* ((num (scene-object-number obj))
@@ -215,7 +236,7 @@
              (begin (reset-movement!) default-game-state)
              state))))
 
-(define (make-end-turn-game-state)
+(define (make-dream-game-state)
   (reset-movement!)
   (let* ((good-objects (interact *user-choices*))
          (dreams (take (permutation dream-textures) good-objects))
@@ -223,10 +244,8 @@
          (items (permutation (append dreams nightmares)))
          (clock 0))
     (let ((factor (/ (max life 0) max-life)))
-      (print factor)
       (mix:volume-chunk! dark-ambiance-sound (inexact->exact (round (* (- 1 factor) 90))))
       (mix:volume-chunk! empty-room-sound (inexact->exact (round (* factor 128)))))
-    (print "Good objects: " good-objects)
     (rec (state dt)
          (render-copy! *renderer* sleep-texture)
          (render-copy! *renderer* (car items) #f (make-rect 0 (floor (* 2 (sin (* clock 3)))) width height))
@@ -237,7 +256,7 @@
                         (set! *user-choices* '())
                         (cond ((= good-objects num-choices)
                                (mix:volume-chunk! dark-ambiance-sound 0)
-                               (mix:volume-chunk! empty-room-sound 10)
+                               (mix:volume-chunk! empty-room-sound 128)
                                (make-last-action-state 'good door-texture))
                               ((<= life 0)
                                (make-last-action-state 'bad window-texture))
