@@ -329,7 +329,7 @@
       bad-end-screen-state))
 
 (define (introduction-game-state dt)
-  (show-formated-text! "Welcome…\nPress A and D to move around and space to interact with your environment.\nPress escape at anytime to give up.")
+  (show-formated-text! "Welcome…\nPress A and D to move around and space to interact with your environment.\nPress escape at anytime to give up.\n \nGraphics by Reptifur\nTexts by Lizenn\n Code by Kooda")
   (if *player-interacting*
       (begin (reset-movement!) default-game-state)
       introduction-game-state))
