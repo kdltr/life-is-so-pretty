@@ -100,8 +100,8 @@
 
 ;; dreams
 
-(define sleep-texture
-  (create-texture-from-surface *renderer* (img:load "sleep.png")))
+(define sleep-textures
+  (map (lambda (f) (create-texture-from-surface *renderer* (img:load f))) (sort (glob "sleep*") string<?)))
 
 (define dream-textures
   (map (lambda (f) (create-texture-from-surface *renderer* (img:load f))) (glob "dream*")))
@@ -114,7 +114,6 @@
 (define all-textures
   (list window-texture door-texture bed-texture computer-texture plush-texture bookcase-texture
         telephone-texture radio-texture television-texture sofa-texture meds-texture
-        sleep-texture
         player-left-texture player-right-texture
         pants-texture clock-texture pizza-texture crack-texture plug-texture))
 
@@ -122,3 +121,9 @@
 (define all-fillers
   (list pants-texture pizza-texture crack-texture clock-texture plug-texture))
 
+(define sleep-frames
+  (circular-list
+   (cons 2.0 (first sleep-textures))
+   (cons 1.0 (second sleep-textures))
+   (cons 1.5 (third sleep-textures))
+   (cons 0.5 (second sleep-textures))))
