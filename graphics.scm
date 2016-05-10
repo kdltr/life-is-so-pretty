@@ -1,4 +1,5 @@
 (use sdl2
+     (only sdl2-internals SDL_GetDesktopDisplayMode)
      (prefix sdl2-image img:)
      clojurian-syntax
      miscmacros
@@ -12,9 +13,6 @@
 
 (include "helpers")
 (include "proto.scm")
-
-(define window-width 960)
-(define window-height 540)
 
 (define width 320)
 (define height 180)
@@ -42,17 +40,14 @@
 (set-hint! 'render-vsync "1")
 (set-hint! 'render-scale-quality "0")
 
-;; (define dm (make-display-mode))
-;; (SDL_GetDesktopDisplayMode 0 dm)
+(define dm (make-display-mode))
+(SDL_GetDesktopDisplayMode 0 dm)
 
-;; (define win (create-window! "Crepes-party-hard-yolo-swag 2015"
-;;                             'undefined 'undefined
-;;                             (display-mode-w dm)
-;;                             (display-mode-h dm)
-;;                             '(fullscreen)))
-
-(define *win*
-  (create-window! "Life Is So Pretty" 'undefined 'undefined window-width window-height '()))
+(define *win* (create-window! "Life Is So Pretty"
+                              'undefined 'undefined
+                              (display-mode-w dm)
+                              (display-mode-h dm)
+                              '(fullscreen)))
 
 (define *renderer*
   (create-renderer! *win* -1 '(accelerated)))
