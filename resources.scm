@@ -13,34 +13,8 @@
 
 ;; images
 
-(define (color:scale-chroma color factor)
-  (let* ((LCh (color->L*C*h color))
-         (chroma (* (cadr LCh) factor)))
-    (L*C*h->color (cons (car LCh) (cons chroma (cddr LCh))))))
 
-(define (desaturate-color color)
-  (let* ((l (color->list color))
-         (c (take l 3))
-         (alpha (last-pair l)))
-    (apply make-color
-           (append
-            (color->sRGB
-             (color:scale-chroma
-              (sRGB->color c)
-              0.5))
-            alpha))))
-
-(define (desaturate source)
-  (identity source)
-  #;
-  (let* ((w (surface-w source))
-  (h (surface-h source))
-  (result (make-surface w h 32)))
-  (dotimes (i w)
-  (dotimes (j h)
-  (set! (surface-ref result i j)
-  (desaturate-color (surface-ref source i j)))))
-  result))
+(define desaturate identity)
 
 (define (textures-from l)
   (map

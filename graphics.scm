@@ -1,15 +1,12 @@
 (use sdl2
      (only sdl2-internals SDL_GetDesktopDisplayMode)
      (prefix sdl2-image img:)
-     clojurian-syntax
+     (prefix sdl2-mixer mix:)
      miscmacros
      vector-lib
      utf8
      srfi-1
-     (only color color->L*C*h L*C*h->color color->sRGB sRGB->color)
-     (prefix sdl2-mixer mix:)
-     posix
-     anaphora)
+     posix)
 
 (include "helpers")
 (include "proto.scm")
@@ -224,20 +221,21 @@
   (show-player!)
 
   (if *player-interacting*
-      (cond ((aand (find-filler-at-player) (eq? (scene-filler-texture it) bed-texture))
-             (make-dream-game-state))
-            ((find-object-at-player)
-             (let ((phrase (random-elt end-turn-phrases)))
-               (reset-movement!)
-               (rec (state dt)
-                    (show-scene!)
-                    (show-player!)
-                    (show-formated-text! phrase)
-                    (if *player-interacting*
-                        (begin (reset-movement!) end-turn-game-state)
-                        state))))
-            (else
-             end-turn-game-state))
+      (let ((flr (find-filler-at-player)))
+        (cond ((and flr (eq? (scene-filler-texture flr) bed-texture))
+               (make-dream-game-state))
+              ((find-object-at-player)
+               (let ((phrase (random-elt end-turn-phrases)))
+                 (reset-movement!)
+                 (rec (state dt)
+                      (show-scene!)
+                      (show-player!)
+                      (show-formated-text! phrase)
+                      (if *player-interacting*
+                          (begin (reset-movement!) end-turn-game-state)
+                          state))))
+              (else
+               end-turn-game-state)))
       end-turn-game-state))
 
 (define (make-interaction-game-state obj)
