@@ -1,0 +1,51 @@
+;;;; -*- Scheme -*-
+
+(define version "0.1.0")
+(define modules '(sdl2-image))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define sdl2-flags-list
+  (if (get-environment-variable "SDL2_FLAGS")
+      (string-split (get-environment-variable "SDL2_FLAGS"))
+      (with-input-from-pipe "sdl2-config --cflags --libs" read-lines)))
+
+(define sdl2-image-flags-list
+  (if (get-environment-variable "SDL2_IMAGE_FLAGS")
+      (string-split (get-environment-variable "SDL2_IMAGE_FLAGS"))
+      '("-lSDL2_image")))
+
+(define emit-types? (version>=? (chicken-version) "4.7.4"))
+
+(define (module-file module extension)
+  (string-append (symbol->string module) extension))
+
+
+(define (compile-module module #!optional (extra-flags-list '()))
+  (newline)
+  (printf "COMPILING MODULE: ~A~N~%" module)
+  (compile -J -v -s -O3 -d1 ,@extra-flags-list
+           ,@(if emit-types?
+                 `(-emit-type-file ,(module-file module ".types"))
+                 '())
+           ,(module-file module ".scm"))
+  (compile -v -s -O3 -d0 ,(module-file module ".import.scm"))
+  (newline))
+
+
+(newline)
+(compile-module 'sdl2-image
+                (append sdl2-flags-list sdl2-image-flags-list))
+(newline)
+
+
+(define products
+  (append-map (lambda (module)
+                (cons* (module-file module ".so")
+                       (module-file module ".import.so")
+                       (if emit-types?
+                           (list (module-file module ".types"))
+                           '())))
+              modules))
+
+(install-extension 'sdl2-image products `((version ,version)))

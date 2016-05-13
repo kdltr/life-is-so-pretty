@@ -1,10 +1,4 @@
 
-(define small-box
-  (create-texture-from-surface *renderer* (img:load "small-box.png")))
-(define big-box
-  (create-texture-from-surface *renderer* (img:load "big-box.png")))
-(define text-font
-  (create-texture-from-surface *renderer* (img:load "font.png")))
 (define character-width 6)
 (define character-height 14)
 

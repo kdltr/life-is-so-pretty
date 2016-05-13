@@ -1,0 +1,11 @@
+;;; vector-lib.meta -*- Hen -*-
+((egg "vector-lib.egg")
+ (files "vector-lib.meta" "vector-lib.scm" "vector-lib.setup" "tests/run.scm")
+ (doc-from-wiki)
+ (test-depends test)
+ (category data)
+ (synopsis
+   "Port of the SRFI-43 reference implementation")
+ (license "BSD")
+ (author "Taylor Campbell")
+ (maintainer "Jim Ursetto"))

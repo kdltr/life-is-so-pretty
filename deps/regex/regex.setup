@@ -1,0 +1,15 @@
+;;;; regex.setup -*- Scheme -*-
+
+
+(unless (version>=? (chicken-version) "4.6.2")
+  (print "\nThis version of CHICKEN has a built-in `regex' library unit.")
+  (print "Installing this extension is not required.\n")
+  (exit))
+
+(compile -s -O3 -d1 regex.scm -JS)
+(compile -s -O3 -d0 regex.import.scm)
+
+(install-extension
+ 'regex
+ '("regex.so" "regex.import.so")
+ '((version 1.0)))

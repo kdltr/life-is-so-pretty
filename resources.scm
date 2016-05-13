@@ -1,12 +1,20 @@
+(define small-box
+  (create-texture-from-surface *renderer* (img:load "assets/small-box.png")))
+(define big-box
+  (create-texture-from-surface *renderer* (img:load "assets/big-box.png")))
+(define text-font
+  (create-texture-from-surface *renderer* (img:load "assets/font.png")))
+
+
 ;; sounds
 
 (define empty-room-sound
-  (mix:load-wav "empty-room.wav"))
+  (mix:load-wav "assets/empty-room.wav"))
 
 (print (get-error))
 
 (define dark-ambiance-sound
-  (mix:load-wav "dark-ambiance.wav"))
+  (mix:load-wav "assets/dark-ambiance.wav"))
 
 (print (get-error))
 
@@ -23,67 +31,67 @@
    l))
 
 
-(define player-left-textures (textures-from (sort (glob "player-left*") string<?)))
-(define player-right-textures (textures-from (sort (glob "player-right*") string<?)))
+(define player-left-textures (textures-from (sort (glob "assets/player-left*") string<?)))
+(define player-right-textures (textures-from (sort (glob "assets/player-right*") string<?)))
 
 
-(define window-surface* (desaturate (img:load "window.png")))
+(define window-surface* (desaturate (img:load "assets/window.png")))
 (define window-texture (create-texture-from-surface *renderer* window-surface*))
 
-(define door-surface (desaturate (img:load "door.png")))
+(define door-surface (desaturate (img:load "assets/door.png")))
 (define door-texture (create-texture-from-surface *renderer* door-surface))
 
-(define bed-surface (desaturate (img:load "bed.png")))
+(define bed-surface (desaturate (img:load "assets/bed.png")))
 (define bed-texture (create-texture-from-surface *renderer* bed-surface))
 
-(define computer-surface (desaturate (img:load "computer.png")))
+(define computer-surface (desaturate (img:load "assets/computer.png")))
 (define computer-texture (create-texture-from-surface *renderer* computer-surface))
 
-(define plush-surface (desaturate (img:load "plush.png")))
+(define plush-surface (desaturate (img:load "assets/plush.png")))
 (define plush-texture (create-texture-from-surface *renderer* plush-surface))
 
-(define bookcase-surface (desaturate (img:load "bookcase.png")))
+(define bookcase-surface (desaturate (img:load "assets/bookcase.png")))
 (define bookcase-texture (create-texture-from-surface *renderer* bookcase-surface))
 
-(define telephone-surface (desaturate (img:load "telephone.png")))
+(define telephone-surface (desaturate (img:load "assets/telephone.png")))
 (define telephone-texture (create-texture-from-surface *renderer* telephone-surface))
 
-(define radio-surface (desaturate (img:load "radio.png")))
+(define radio-surface (desaturate (img:load "assets/radio.png")))
 (define radio-texture (create-texture-from-surface *renderer* radio-surface))
 
-(define television-surface (desaturate (img:load "television.png")))
+(define television-surface (desaturate (img:load "assets/television.png")))
 (define television-texture (create-texture-from-surface *renderer* television-surface))
 
-(define sofa-surface (desaturate (img:load "sofa.png")))
+(define sofa-surface (desaturate (img:load "assets/sofa.png")))
 (define sofa-texture (create-texture-from-surface *renderer* sofa-surface))
 
-(define meds-surface (desaturate (img:load "meds.png")))
+(define meds-surface (desaturate (img:load "assets/meds.png")))
 (define meds-texture (create-texture-from-surface *renderer* meds-surface))
 
-(define pants-surface (desaturate (img:load "pants.png")))
+(define pants-surface (desaturate (img:load "assets/pants.png")))
 (define pants-texture (create-texture-from-surface *renderer* pants-surface))
 
-(define clock-surface (desaturate (img:load "clock.png")))
+(define clock-surface (desaturate (img:load "assets/clock.png")))
 (define clock-texture (create-texture-from-surface *renderer* clock-surface))
 
-(define pizza-surface (desaturate (img:load "pizza.png")))
+(define pizza-surface (desaturate (img:load "assets/pizza.png")))
 (define pizza-texture (create-texture-from-surface *renderer* pizza-surface))
 
-(define crack-surface (desaturate (img:load "crack.png")))
+(define crack-surface (desaturate (img:load "assets/crack.png")))
 (define crack-texture (create-texture-from-surface *renderer* crack-surface))
 
-(define plug-surface (desaturate (img:load "plug.png")))
+(define plug-surface (desaturate (img:load "assets/plug.png")))
 (define plug-texture (create-texture-from-surface *renderer* plug-surface))
 
-(define dildo-surface (desaturate (img:load "dildo.png")))
+(define dildo-surface (desaturate (img:load "assets/dildo.png")))
 (define dildo-texture (create-texture-from-surface *renderer* dildo-surface))
 
 
 ;; dreams
 
-(define sleep-textures (textures-from (sort (glob "sleep*") string<?)))
-(define dream-textures (textures-from (glob "dream*")))
-(define nightmare-textures (textures-from (glob "nightmare*")))
+(define sleep-textures (textures-from (sort (glob "assets/sleep*") string<?)))
+(define dream-textures (textures-from (glob "assets/dream*")))
+(define nightmare-textures (textures-from (glob "assets/nightmare*")))
 
 
 

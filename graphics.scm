@@ -8,6 +8,9 @@
      srfi-1
      posix)
 
+;;(foreign-declare "#include <SDL_main.h>")
+;;(foreign-declare "#include <SDL.h>")
+
 (include "helpers")
 (include "proto.scm")
 

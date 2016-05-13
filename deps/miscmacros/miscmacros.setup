@@ -1,0 +1,11 @@
+;;;; miscmacros.setup -*- Scheme -*-
+
+(compile -s -O3 -d0 miscmacros.scm -j miscmacros)
+(compile -s -O3 -d0 miscmacros.import.scm)
+
+(install-extension
+ 'miscmacros
+ '("miscmacros.so" "miscmacros.import.so")
+ '((syntax) 
+   (import-only)
+   (version 2.96)))

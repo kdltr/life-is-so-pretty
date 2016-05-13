@@ -1,0 +1,11 @@
+;;;; -*- Scheme -*-
+
+((egg "sdl2-image.egg")
+ (synopsis "Bindings to SDL_image 2")
+ (author "John Croisant")
+ (category graphics)
+ (license "BSD")
+ (depends sdl2)
+ (test-depends test)
+ (foreign-depends "SDL >= 2.0.0"
+                  "SDL_image >= 2.0.0"))

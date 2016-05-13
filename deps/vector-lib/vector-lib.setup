@@ -1,0 +1,7 @@
+(compile -s -O2 -d2 vector-lib.scm -j vector-lib)
+(compile -s -O2 -d2 vector-lib.import.scm)
+
+(install-extension 'vector-lib
+	`("vector-lib.so"
+	  "vector-lib.import.so")
+	`((version "1.2.2")))

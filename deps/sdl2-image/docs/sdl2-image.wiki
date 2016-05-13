@@ -1,0 +1,264 @@
+
+This file contains an archive of the sdl2-image egg wiki page.
+The most up-to-date version of these docs is available at:
+http://wiki.call-cc.org/eggref/4/sdl2-image
+
+
+== sdl2-image
+
+The sdl2-image egg provides bindings to
+[[http://www.libsdl.org/projects/SDL_image/|SDL_image]] version 2.
+SDL_image is a library for loading various image formats, compatible
+with [[http://libsdl.org/|Simple DirectMedia Layer]] version 2 (SDL2),
+a popular library used in games and other media-rich software.
+
+The sdl2-image egg is designed to be compatible with the
+[[/egg/sdl2|sdl2]] egg, which provides bindings to SDL 2 itself.
+
+; Project / Source Code Repository : [[https://gitlab.com/chicken-sdl2/chicken-sdl2-image]]
+; Issue Tracker : [[https://gitlab.com/chicken-sdl2/chicken-sdl2-image/issues]]
+; Maintainer : John Croisant (john+chicken at croisant dot net)
+; License: [[https://gitlab.com/chicken-sdl2/chicken-sdl2-image/blob/master/LICENSE-BSD.txt|BSD 2-Clause]]
+
+
+'''Table of Contents:'''
+
+[[toc:]]
+
+
+== Requirements
+
+The sdl2-image egg requires the [[/egg/sdl2|sdl2]] egg,
+[[http://libsdl.org/|Simple DirectMedia Layer]] version 2.0.0 or
+higher, and [[http://www.libsdl.org/projects/SDL_image/|SDL_image]]
+version 2.0 or higher. It will not work with older versions of SDL or
+SDL_image.
+
+This egg requires CHICKEN Scheme 4.8 or higher.
+Please file an issue or contact the maintainer if you need to use this library with an earlier version of CHICKEN Scheme.
+
+
+== Installation
+
+When installing the egg, you should set the {{SDL2_FLAGS}} environment
+variable to a string of compiler flags to be used when compiling the
+egg. If you have the {{sdl2-config}} helper program installed on your
+system, you can set appropriate flags and install the extension like
+so (notice these are back ticks, not quotes):
+
+ export SDL2_FLAGS=`sdl2-config --cflags --libs`
+ chicken-install sdl2-image
+
+If you do not have the {{sdl2-config}} helper program installed on your
+computer, you may manually specify SDL-related compiler flags (notice
+these are double quotes, not back ticks):
+
+ export SDL2_FLAGS="-I/usr/local/include/SDL2 -L/usr/local/lib -lSDL2"
+ chicken-install sdl2-image
+
+By default, the sdl2-image egg will be linked against SDL_image using
+the compiler flag {{-lSDL2_image}}. You can override this by setting the
+{{SDL2_IMAGE_FLAGS}} environment variable, if needed. You can also use
+that environment variable in case you have installed SDL_image in a
+different location than SDL.
+
+The {{SDL2_FLAGS}} and {{SDL2_IMAGE_FLAGS}} environment variables are
+only needed during installation of the egg. They do not need to be set
+during normal use.
+
+
+== Usage and Examples
+
+To avoid procedure name collisions, it is recommended that you import
+the sdl2-image module using a prefix such as "img:", like so:
+
+<enscript highlight="scheme">
+(use (prefix sdl2-image img:))
+(img:load "image.jpg")
+</enscript>
+
+The [[https://gitlab.com/chicken-sdl2/chicken-sdl2-examples|chicken-sdl2-examples repository]]
+contains complete example games and programs, some of which use the sdl2-image egg.
+
+
+== Version History
+
+; 0.1.0 (2015-12-19) : Initial release.
+
+For more information about what changed in each version,
+see the [[https://gitlab.com/chicken-sdl2/chicken-sdl2-image/blob/master/CHANGELOG.md|CHANGELOG]].
+
+
+
+== API
+
+=== Quick Start
+
+<enscript highlight="scheme">
+(use (prefix sdl2 sdl2:)
+     (prefix sdl2-image img:)
+     (only lolevel
+           object-evict object-release))
+
+;; Load an image from a file.
+(img:load "path/to/my-image.jpg") ;; or png, gif, etc.
+
+;; Load an image from a blob containing image data.
+;; The blob is evicted to static memory so that it will
+;; not be moved in memory by the garbage collector.
+(let* ((source (object-evict '#${...}))
+       (rwops (sdl2:rw-from-blob source))
+       (surf (img:load-rw rwops #t)))
+  (object-release source)
+  surf)
+
+;; Load an image from a string containing image data.
+;; Like above, the string is evicted.
+(let* ((source (object-evict "..."))
+       (rwops (sdl2:rw-from-string source))
+       (surf (img:load-rw rwops #t)))
+  (object-release source)
+  surf)
+</enscript>
+
+
+=== About the API
+
+==== API Stability
+
+The sdl2-image egg follows "[[http://semver.org/|semantic versioning]]".
+Until version 1.0.0 is released, the API is not guaranteed to be "stable".
+That means the maintainer reserves the right to change the API if needed,
+possibly in ways that break backwards compatibility with previous versions.
+'''Large backwards-incompatible changes are unlikely''',
+but there may be small tweaks and fixes to the API if problems are discovered.
+
+After version 1.0.0 is released, the API is guaranteed to remain stable (no backwards-incompatible changes)
+until the next new major version (e.g. going from version 1.x to 2.0.0, or 2.x to 3.0.0).
+
+==== Conventions
+
+* Procedure names are lower case and hyphenated, with no "IMG_" prefix.
+
+* Procedures that cause a side effect are suffixed with "!".
+
+* Some procedures have two versions: one that returns a managed sdl2:surface, and one that returns an unmanaged sdl2:surface.
+  See [[/egg/sdl2#struct-memory-management|Struct Memory Management]] in the sdl2 egg docs.
+
+* Procedures signal an exception of kind {{(exn sdl2)}} if they fail.
+
+
+=== General
+
+<procedure>(init! #!optional loaders) → list of symbols</procedure>
+
+See [[http://www.libsdl.org/projects/SDL_image/docs/SDL_image.html#SEC8|IMG_Init]].
+
+{{loaders}} defaults to {{'(jpg png tif)}}. It must be a list of zero
+or more of those symbols, indicating which image loaders to
+initialize. (Other image formats are built into SDL_image and do not
+need to be initialized.)
+
+Returns a list of symbols indicating all the image loaders that are
+now initialized, including any that were already initialized. You
+should check the return value to see whether all the image loaders you
+requested were actually initialized. If not, {{get-error}} from the
+sdl2 egg ''might'' return an error message explaining why the image
+loader could not be initialized. (This is a limitation of SDL_image.)
+
+It is not usually necessary to call this procedure. Image loaders will
+automatically be initialized when needed. But, you may wish to call
+this procedure to check whether a loader is available, or to
+initialize the loaders ahead of time to avoid a small delay later.
+
+
+<procedure>(quit!)</procedure>
+
+See [[http://www.libsdl.org/projects/SDL_image/docs/SDL_image.html#SEC9|IMG_Quit]].
+
+
+<procedure>(compiled-version) → list of fixnums</procedure>
+<procedure>(current-version)  → list of fixnums</procedure>
+
+Returns a list of three nonnegative integers, indicating a version number of SDL_image.
+For example, the list {{(2 0 0)}} indicates SDL_image 2.0.0.
+
+* {{compiled-version}} returns the version of SDL_image that the sdl2-image egg was compiled with.
+* {{current-version}} returns the version of SDL_image that the sdl2-image egg is currently using.
+
+For example, the user may have compiled the sdl2-image egg with SDL_image 2.0.0, then later upgraded SDL_image to 2.1.0, but not yet recompiled the sdl2-image egg with the new version.
+In such a case, {{compiled-version}} would return {{(2 0 0)}}, and {{current-version}} would return {{(2 1 0)}}.
+But, features from the new version would not be available until the user recompiles the sdl2-image egg.
+
+See [[http://www.libsdl.org/projects/SDL_image/docs/SDL_image.html#SEC7|SDL_IMAGE_VERSION and IMG_LinkedVersion]].
+
+
+
+=== Loading
+
+<procedure>(load  filepath) → sdl2:surface</procedure>
+<procedure>(load* filepath) → sdl2:surface</procedure>
+
+Attempts to load the image file at the given filepath (a string).
+The image may be any format supported by SDL_image.
+See [[http://www.libsdl.org/projects/SDL_image/docs/SDL_image.html#SEC11|IMG_Load]].
+
+Returns a [[/egg/sdl2#sdl2surface|sdl2:surface]] with the image contents.
+Signals an exception of kind {{(exn sdl2)}} if the image could not be loaded.
+
+* {{load}} returns a managed sdl2:surface.
+* {{load*}} returns an unmanaged sdl2:surface, which must be freed with {{free-surface!}} (from the sdl2 egg) when you are done with it.
+
+
+<procedure>(load-rw  rwops #!optional close?) → sdl2:surface</procedure>
+<procedure>(load-rw* rwops #!optional close?) → sdl2:surface</procedure>
+
+Attempts to load an image from an [[/egg/sdl2#rwops|sdl2:rwops]].
+This procedure allows you to load an image from a variety of sources, such as a [[/man/4/Unit library#blobs|blob]], string, memory pointer, or file.
+See [[http://www.libsdl.org/projects/SDL_image/docs/SDL_image.html#SEC12|IMG_Load_RW]].
+
+The image may be any format supported by SDL_image, except TGA.
+If you want to load a TGA image from an sdl2:rwops, you should use {{load-typed-rw}} instead.
+
+If {{close?}} is #t, the sdl2:rwops will be automatically closed after the image is loaded.
+See {{rw-close!}} in the sdl2 egg.
+If {{close?}} is #f (the default), the sdl2:rwops will not be closed.
+
+Returns a [[/egg/sdl2#sdl2surface|sdl2:surface]] with the image contents.
+Signals an exception of kind {{(exn sdl2)}} if the image could not be loaded.
+
+* {{load-rw}} returns a managed sdl2:surface.
+* {{load-rw*}} returns an unmanaged sdl2:surface, which must be freed with {{free-surface!}} (from the sdl2 egg) when you are done with it.
+
+
+<procedure>(load-typed-rw  rwops close? type-hint) → sdl2:surface</procedure>
+<procedure>(load-typed-rw* rwops close? type-hint) → sdl2:surface</procedure>
+
+See [[http://www.libsdl.org/projects/SDL_image/docs/SDL_image.html#SEC13|IMG_LoadTyped_RW]].
+
+Similar to {{load-rw}}, except you also give a hint to help SDL_image figure out what the image format is.
+In practice, this is only necessary when loading a TGA image from an sdl2:rwops.
+For other image formats you can just use {{load-rw}} instead.
+
+{{type-hint}} must be one of the following strings (case is not important):
+
+* {{"BMP"}}
+* {{"CUR"}}
+* {{"GIF"}}
+* {{"ICO"}}
+* {{"JPG"}}
+* {{"LBM"}}
+* {{"PCX"}}
+* {{"PNG"}}
+* {{"PNM"}}
+* {{"TGA"}}
+* {{"TIF"}}
+* {{"XCF"}}
+* {{"XPM"}}
+* {{"XV"}}
+
+Returns a [[/egg/sdl2#sdl2surface|sdl2:surface]] containing the image.
+Signals an exception of kind {{(exn sdl2)}} if the image could not be loaded.
+
+* {{load-rw-typed}} returns a managed sdl2:surface.
+* {{load-rw-typed*}} returns an unmanaged sdl2:surface, which must be freed with {{free-surface!}} (from the sdl2 egg) when you are done with it.

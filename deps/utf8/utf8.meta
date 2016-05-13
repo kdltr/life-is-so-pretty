@@ -1,0 +1,11 @@
+;;; utf8.meta -*- Hen -*-
+
+((egg "utf8.egg")
+ (synopsis "Unicode support")
+ (category parsing)
+ (needs iset regex make)
+ (test-depends test)
+ (license "BSD")
+ (author "Alex Shinn")
+ (doc-from-wiki)
+ (files "utf8-case-map.scm" "utf8.release-info" "case-map-2.dat" "case-map-1.dat" "utf8.meta" "utf8-srfi-14.scm" "unicode-char-sets.scm" "utf8.setup" "utf8-lolevel.scm" "string-pointer.scm" "tests/utf8-loop-test.scm" "tests/run.scm" "utf8-srfi-13.scm" "utf8.scm"))

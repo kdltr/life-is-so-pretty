@@ -1,0 +1,8 @@
+;;;; regex.meta -*- Scheme -*-
+
+((synopsis "Compatibility library for old regular expression API")
+ (category misc)
+ (doc-from-wiki)
+ (license "BSD")
+ (files "regex.wiki" "regex.setup" "regex.meta" "regex.scm"))
+

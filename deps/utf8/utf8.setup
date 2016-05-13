@@ -1,0 +1,60 @@
+
+(use make)
+
+(define version "3.4.4")
+
+(make (("utf8-lolevel.so" ("utf8-lolevel.scm")
+        (compile -fixnum-arithmetic -inline -local -s -O3 -d0
+                 -j utf8-lolevel utf8-lolevel.scm)
+        (compile -s -O2 -d0 utf8-lolevel.import.scm))
+       ("utf8.so" ("utf8.scm")
+        (compile -fixnum-arithmetic -inline -local -s -O2 -d1
+                 -j utf8 utf8.scm)
+        (compile -s -O2 -d0 utf8.import.scm)
+        )
+       ("utf8-srfi-14.so" ("utf8-srfi-14.scm")
+        (compile -fixnum-arithmetic -inline -local -s -O2 -d1
+                 -j utf8-srfi-14 utf8-srfi-14.scm)
+        (compile -s -O2 -d0 utf8-srfi-14.import.scm)
+        )
+       ("unicode-char-sets.so" ("unicode-char-sets.scm")
+        (compile -fixnum-arithmetic -inline -local -s -O2 -d1
+                 -j unicode-char-sets unicode-char-sets.scm)
+        (compile -s -O2 -d0 unicode-char-sets.import.scm)
+        )
+       ("utf8-case-map.so" ("utf8-case-map.scm")
+        (compile -fixnum-arithmetic -inline -local -s -O2 -d1
+                 -j utf8-case-map utf8-case-map.scm)
+        (compile -s -O2 -d0 utf8-case-map.import.scm)
+        )
+       ("utf8-srfi-13.so" ("utf8-srfi-13.scm")
+        (compile -fixnum-arithmetic -inline -local -s -O2 -d1
+                 -j utf8-srfi-13 utf8-srfi-13.scm)
+        (compile -s -O2 -d0 utf8-srfi-13.import.scm)))
+  '("utf8-lolevel.so" "utf8.so" "utf8-srfi-14.so"
+    "unicode-char-sets.so" "utf8-case-map.so" "utf8-srfi-13.so"))
+
+(install-extension 'utf8-lolevel
+ '("utf8-lolevel.so" "utf8-lolevel.import.so")
+ `((version ,version)))
+
+(install-extension 'utf8
+ '("utf8.so" "utf8.import.so")
+ `((version ,version) (documentation "utf8.html")))
+
+(install-extension 'utf8-srfi-14
+ '("utf8-srfi-14.so" "utf8-srfi-14.import.so")
+ `((version ,version)))
+
+(install-extension 'unicode-char-sets
+ '("unicode-char-sets.so" "unicode-char-sets.import.so")
+ `((version ,version)))
+
+(install-extension 'utf8-case-map
+ '("utf8-case-map.so" "utf8-case-map.import.so"
+   "case-map-1.dat" "case-map-2.dat")
+ `((version ,version)))
+
+(install-extension 'utf8-srfi-13
+ '("utf8-srfi-13.so" "utf8-srfi-13.import.so")
+ `((version ,version)))

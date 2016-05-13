@@ -1,0 +1,16 @@
+Source: chicken-miscmacros
+Section: libs
+Priority: optional
+Maintainer: Ivan Raikov <iraikov@ece.gatech.edu>
+Build-Depends: debhelper (>> 3.0.0), chicken-bin (>= 2.4), libchicken-dev (>= 2.4)
+Standards-Version: 3.6.2
+
+Package: chicken-miscmacros
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, chicken-bin (>= 2.4)
+Description: Various useful little macros in Scheme.
+ A collection of macros for Chicken Scheme, including until, repeat,
+ while, let/cc and others.
+ .
+ Homepage: http://www.call-with-current-continuation.org/eggs/miscmacros.html
